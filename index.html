@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Friend/諾諾</title>
+<style>
+  /* ---------- 統一字體宣告：清松手寫體2 ---------- */
+  @font-face {
+    font-family: 'JasonHandwriting2';
+    src: local('JasonHandwriting2'), 
+         local('清松手寫體2'),
+         url('JasonHandwriting2.woff2') format('woff2'),
+         url('JasonHandwriting2.woff') format('woff'),
+         url('JasonHandwriting2.ttf') format('truetype'),
+         url('JasonHandwriting2.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root{
+    --ink: #0e0d0b;
+    --ink-2: #17150f;
+    --ink-3: #1f1c15;
+    --brass: #c9a15a;
+    --brass-dim: #8c7239;
+    --oxblood: #8a3a3a;
+    --ivory: #ede6d6;
+    --stone: #948c78;
+    --line: rgba(201,161,90,0.16);
+    --top-h: 60px;
+  }
+  *{ 
+    box-sizing:border-box; 
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'JasonHandwriting2', sans-serif;
+  }
+  html{ 
+    scroll-behavior:smooth; 
+    scroll-padding-top: calc(var(--top-h) + 48px); 
+  }
+  body{
+    margin:0;
+    background: var(--ink);
+    color: var(--ivory);
+    font-family: 'JasonHandwriting2', sans-serif;
+    font-weight:400;
+    line-height:1.75;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a{ color:inherit; text-decoration: none; }
+  .eyebrow{
+    font-size:11px; letter-spacing:.2em; color:var(--brass); text-transform:uppercase;
+  }
+  h1,h2,h3,h4{ 
+    font-weight:700; 
+    margin:0; 
+    color:var(--ivory); 
+  }
+
+  /* ---------- 固定星空背景 ---------- */
+  .starfield-wrap{
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    transform: translateZ(0);
+    contain: strict;
+    will-change: transform;
+  }
+  .starfield{
+    width: 100%; height: 100%;
+    display: block;
+  }
+
+  /* ---------- Sticky Top Bar ---------- */
+  .topbar{
+    position: sticky; top:0; z-index:30;
+    height: var(--top-h);
+    display:flex; align-items:center; gap:12px;
+    padding: 0 16px;
+    background: #0e0d0bf8;
+    border-bottom: 1px solid var(--line);
+    transform: translateZ(0);
+  }
+  .mark{
+    width:32px; height:32px; flex-shrink:0;
+    border:1px solid var(--brass-dim);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    overflow: hidden;
+    border-radius: 50%;
+  }
+  .mark img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .mark::after{ content:""; position:absolute; inset:3px; border:1px solid var(--brass-dim); opacity:.5; pointer-events:none; border-radius: 50%; }
+  .topbar .who{ font-size:13px; color:var(--stone); white-space:nowrap; }
+  .topbar .who b{ color:var(--ivory); font-weight:600; }
+
+  /* 水平分類導航列 */
+  .chapters{
+    position: sticky; top: var(--top-h); z-index:29;
+    display:flex; gap:6px;
+    padding: 10px 14px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    background: #0e0d0bf8;
+    border-bottom: 1px solid var(--line);
+    transform: translateZ(0);
+  }
+  .chapters::-webkit-scrollbar{ display:none; }
+  .chapters a{
+    flex-shrink:0;
+    display:flex; align-items:center; gap:6px;
+    padding: 8px 14px;
+    border:1px solid var(--line);
+    color:var(--stone);
+    font-size:13px;
+    border-radius: 2px;
+    transition: color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .chapters a .num{ font-size:10px; color:var(--brass-dim); }
+  .chapters a.active{ color:var(--ivory); border-color:var(--brass); background:var(--ink-2); }
+  .chapters a.active .num{ color:var(--brass); }
+
+  /* ---------- 區塊佈局 ---------- */
+  main{ max-width: 1160px; margin: 0 auto; }
+  section{
+    padding: 52px 20px;
+    border-bottom: 1px solid var(--line);
+    contain: content;
+  }
+  section:last-of-type{ border-bottom:none; }
+
+  .sec-grid{
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .sec-left{ flex: 1; min-width: 0; }
+  .sec-right{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  @media (min-width: 860px){
+    section{ padding: 68px 32px; }
+    .sec-grid{
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 44px;
+    }
+    .sec-left{ flex: 1.15; }
+    .sec-right{
+      width: 340px;
+      flex-shrink: 0;
+      position: sticky;
+      top: calc(var(--top-h) + 60px);
+    }
+  }
+
+  /* Hero */
+  #s00{
+    padding-top: 50px;
+    min-height: calc(100svh - var(--top-h) - 50px);
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .hero-meta{
+    font-size:11px; color:var(--stone);
+    display:flex; flex-direction:column; gap:6px;
+    margin-bottom: 20px;
+  }
+  .hero-meta span::before{ content:"— "; color:var(--brass-dim); }
+  .hero h1{ font-size: clamp(38px, 9vw, 68px); line-height:1.05; margin: 4px 0 14px; }
+  .hero .role{
+    font-weight:500;
+    font-size:18px; color:var(--brass); margin-bottom:20px;
+  }
+  .hero .tagline{
+    color:var(--stone); font-size:15px;
+    border-left:2px solid var(--oxblood);
+    padding-left:16px;
+    max-width: 700px;
+  }
+  .scroll-hint{
+    margin-top: 36px;
+    font-size:11px; color:var(--brass-dim);
+    display:flex; align-items:center; gap:8px;
+  }
+  .scroll-hint::after{ content:"↓"; animation: bob 1.6s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(4px);} }
+
+  h2.section-title{ font-size:26px; margin-top:8px; margin-bottom: 14px; }
+  p{ color:var(--ivory); font-size:15px; margin: 12px 0; }
+
+  /* 4格小圖 (文字完整顯示、自動換行) */
+  .four-icons{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .four-item{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    min-width: 0;
+  }
+  .four-thumb{
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+    border: 1px solid rgba(201,161,90,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .four-thumb img{ 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    display: block; 
+  }
+  .four-item:active .four-thumb,
+  .four-item:hover .four-thumb{ transform: translateY(-2px); border-color: var(--brass); }
+  .four-name{
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ivory);
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.25;
+    max-width: 100%;
+  }
+
+  /* YouTube / 推薦歌曲 Card */
+  .yt-box{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .yt-box-title{
+    font-size: 10px;
+    letter-spacing: .12em;
+    color: var(--stone);
+    text-transform: uppercase;
+  }
+  .yt-card{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .yt-card:active,
+  .yt-card:hover{
+    border-color: var(--brass);
+    background: var(--ink-3);
+  }
+  .yt-thumb{
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    background: #111;
+  }
+  .yt-thumb img{ width: 100%; height: 100%; object-fit: cover; }
+  .yt-thumb::after{
+    content: "▶";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #fff;
+    background: rgba(0,0,0,0.3);
+  }
+  .yt-meta{ flex: 1; min-width: 0; }
+  .yt-name{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ivory);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .yt-sub{
+    font-size: 11px;
+    color: var(--stone);
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top: 12px; }
+  .tag{
+    font-size:12px; padding:4px 10px; border:1px solid var(--line);
+    color:var(--ivory); background:var(--ink-2); border-radius: 2px;
+  }
+
+  .stamp{
+    font-size:15px;
+    color:var(--brass); border:1px solid var(--line); padding:18px;
+    position:relative;
+  }
+  .stamp::before{
+    content:"“"; position:absolute; top:-8px; left:12px; font-size:36px;
+    color:var(--brass-dim); 
+  }
+
+  footer{
+    padding: 36px 20px 52px;
+    color:var(--stone); font-size:11px; 
+    display:flex; flex-direction:column; gap:8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 固定星空背景 -->
+<div class="starfield-wrap">
+<svg class="starfield" viewBox="0 0 700 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <radialGradient id="skyGrad" cx="30%" cy="20%" r="90%">
+      <stop offset="0%" stop-color="#181229"/>
+      <stop offset="55%" stop-color="#0c0a12"/>
+      <stop offset="100%" stop-color="#08070a"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="700" height="900" fill="url(#skyGrad)"/>
+
+  <!-- 星點 -->
+  <circle cx="226.7" cy="135.8" r="1.5" fill="#fff" opacity="0.28"/>
+  <circle cx="574.9" cy="84.7" r="1.2" fill="#fff" opacity="0.28"/>
+  <circle cx="355.2" cy="33.7" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="168.5" cy="495.9" r="0.6" fill="#fff" opacity="0.75"/>
+  <circle cx="86.7" cy="200.9" r="1.5" fill="#fff" opacity="0.6"/>
+  <circle cx="43.3" cy="527.0" r="0.6" fill="#fff" opacity="0.84"/>
+  <circle cx="32.6" cy="772.6" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="378.5" cy="513.8" r="1.2" fill="#fff" opacity="0.74"/>
+  <circle cx="126.5" cy="523.4" r="1.5" fill="#fff" opacity="0.36"/>
+  <circle cx="68.2" cy="640.9" r="1.2" fill="#fff" opacity="0.29"/>
+  <circle cx="144.2" cy="612.4" r="1" fill="#fff" opacity="0.72"/>
+  <circle cx="325.9" cy="831.1" r="1" fill="#fff" opacity="0.43"/>
+  <circle cx="556.1" cy="629.1" r="0.8" fill="#fff" opacity="0.3"/>
+  <circle cx="210.2" cy="445.6" r="1" fill="#fff" opacity="0.69"/>
+  <circle cx="201.6" cy="882.2" r="0.6" fill="#fff" opacity="0.56"/>
+  <circle cx="115.5" cy="307.9" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="673.4" cy="69.9" r="1.2" fill="#fff" opacity="0.59"/>
+  <circle cx="612.8" cy="282.4" r="1.5" fill="#fff" opacity="0.46"/>
+  <circle cx="347.7" cy="717.2" r="0.6" fill="#fff" opacity="0.75"/>
+  <circle cx="661.3" cy="426.7" r="1.5" fill="#fff" opacity="0.29"/>
+  <circle cx="511.8" cy="278.6" r="1.2" fill="#fff" opacity="0.85"/>
+  <circle cx="575.3" cy="256.1" r="1" fill="#fff" opacity="0.78"/>
+  <circle cx="242.9" cy="846.6" r="1" fill="#fff" opacity="0.35"/>
+  <circle cx="82.0" cy="53.1" r="1" fill="#fff" opacity="0.33"/>
+  <circle cx="173.3" cy="351.9" r="1" fill="#fff" opacity="0.3"/>
+  <circle cx="314.4" cy="494.5" r="0.8" fill="#fff" opacity="0.74"/>
+  <circle cx="604.8" cy="250.6" r="1" fill="#fff" opacity="0.84"/>
+  <circle cx="477.9" cy="342.4" r="0.8" fill="#fff" opacity="0.34"/>
+  <circle cx="123.4" cy="208.8" r="0.8" fill="#fff" opacity="0.26"/>
+  <circle cx="581.8" cy="164.1" r="1" fill="#fff" opacity="0.25"/>
+  <circle cx="293.3" cy="332.3" r="1.2" fill="#fff" opacity="0.44"/>
+  <circle cx="87.8" cy="773.3" r="1.2" fill="#fff" opacity="0.64"/>
+  <circle cx="517.8" cy="411.0" r="1.5" fill="#fff" opacity="0.73"/>
+  <circle cx="274.7" cy="359.1" r="0.6" fill="#fff" opacity="0.54"/>
+  <circle cx="280.3" cy="171.5" r="0.8" fill="#fff" opacity="0.51"/>
+  <circle cx="76.9" cy="540.7" r="0.6" fill="#fff" opacity="0.25"/>
+  <circle cx="105.9" cy="91.3" r="1" fill="#fff" opacity="0.62"/>
+  <circle cx="49.2" cy="187.2" r="1" fill="#fff" opacity="0.34"/>
+  <circle cx="176.6" cy="312.7" r="1" fill="#fff" opacity="0.53"/>
+  <circle cx="80.7" cy="439.3" r="1" fill="#fff" opacity="0.54"/>
+  <circle cx="218.3" cy="129.7" r="1.5" fill="#fff" opacity="0.46"/>
+  <circle cx="185.3" cy="746.0" r="0.8" fill="#fff" opacity="0.56"/>
+  <circle cx="143.7" cy="856.8" r="1" fill="#fff" opacity="0.34"/>
+  <circle cx="380.2" cy="24.3" r="1.2" fill="#fff" opacity="0.43"/>
+  <circle cx="450.0" cy="81.9" r="1" fill="#fff" opacity="0.56"/>
+  <circle cx="635.8" cy="320.1" r="0.8" fill="#fff" opacity="0.57"/>
+  <circle cx="545.3" cy="296.7" r="0.8" fill="#fff" opacity="0.62"/>
+  <circle cx="551.9" cy="682.5" r="0.8" fill="#fff" opacity="0.73"/>
+  <circle cx="572.8" cy="665.9" r="0.8" fill="#fff" opacity="0.37"/>
+  <circle cx="344.9" cy="657.9" r="0.6" fill="#fff" opacity="0.72"/>
+  <circle cx="330.6" cy="174.3" r="1.2" fill="#fff" opacity="0.82"/>
+  <circle cx="313.1" cy="843.3" r="1" fill="#fff" opacity="0.82"/>
+  <circle cx="255.2" cy="198.4" r="0.8" fill="#fff" opacity="0.53"/>
+  <circle cx="236.4" cy="434.4" r="1.2" fill="#fff" opacity="0.75"/>
+  <circle cx="335.6" cy="587.7" r="1.5" fill="#fff" opacity="0.3"/>
+  <circle cx="462.4" cy="818.8" r="1.5" fill="#fff" opacity="0.7"/>
+  <circle cx="334.6" cy="160.7" r="1.5" fill="#fff" opacity="0.45"/>
+  <circle cx="560.6" cy="874.5" r="1" fill="#fff" opacity="0.53"/>
+  <circle cx="520.3" cy="76.4" r="0.8" fill="#fff" opacity="0.35"/>
+  <circle cx="88.9" cy="136.0" r="1" fill="#fff" opacity="0.73"/>
+  <circle cx="102.3" cy="743.9" r="1" fill="#fff" opacity="0.64"/>
+  <circle cx="245.3" cy="493.8" r="0.8" fill="#fff" opacity="0.26"/>
+  <circle cx="559.5" cy="653.7" r="0.6" fill="#fff" opacity="0.57"/>
+  <circle cx="653.5" cy="390.4" r="0.8" fill="#fff" opacity="0.75"/>
+  <circle cx="147.7" cy="226.7" r="1" fill="#fff" opacity="0.55"/>
+  <circle cx="534.6" cy="293.4" r="1.2" fill="#fff" opacity="0.5"/>
+  <circle cx="91.8" cy="819.0" r="1" fill="#fff" opacity="0.79"/>
+  <circle cx="463.7" cy="733.5" r="1.2" fill="#fff" opacity="0.5"/>
+  <circle cx="642.4" cy="451.5" r="1.2" fill="#fff" opacity="0.34"/>
+  <circle cx="357.4" cy="785.5" r="0.8" fill="#fff" opacity="0.62"/>
+  <circle cx="543.2" cy="134.8" r="0.8" fill="#fff" opacity="0.53"/>
+  <circle cx="507.6" cy="500.8" r="1" fill="#fff" opacity="0.66"/>
+  <circle cx="371.5" cy="434.2" r="0.6" fill="#fff" opacity="0.78"/>
+  <circle cx="39.8" cy="172.2" r="0.6" fill="#fff" opacity="0.71"/>
+  <circle cx="355.4" cy="505.6" r="0.6" fill="#fff" opacity="0.52"/>
+  <circle cx="428.8" cy="455.0" r="1.2" fill="#fff" opacity="0.37"/>
+  <circle cx="194.0" cy="457.3" r="1" fill="#fff" opacity="0.55"/>
+  <circle cx="173.4" cy="470.9" r="1" fill="#fff" opacity="0.8"/>
+  <circle cx="624.9" cy="182.3" r="1" fill="#fff" opacity="0.33"/>
+  <circle cx="85.1" cy="397.9" r="0.6" fill="#fff" opacity="0.65"/>
+  <circle cx="299.8" cy="191.4" r="1" fill="#fff" opacity="0.72"/>
+  <circle cx="627.9" cy="139.0" r="1.5" fill="#fff" opacity="0.64"/>
+  <circle cx="256.3" cy="227.8" r="0.8" fill="#fff" opacity="0.83"/>
+  <circle cx="153.7" cy="857.3" r="1" fill="#fff" opacity="0.78"/>
+  <circle cx="114.0" cy="601.0" r="0.8" fill="#fff" opacity="0.35"/>
+  <circle cx="302.1" cy="464.0" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="249.6" cy="83.0" r="1" fill="#fff" opacity="0.26"/>
+  <circle cx="387.8" cy="396.4" r="0.6" fill="#fff" opacity="0.48"/>
+  <circle cx="362.2" cy="265.9" r="0.6" fill="#fff" opacity="0.32"/>
+  <circle cx="643.0" cy="205.7" r="0.6" fill="#fff" opacity="0.3"/>
+
+  <!-- 亮藍星 -->
+  <circle cx="630" cy="230" r="2.6" fill="#7d9dff" opacity="0.9"/>
+
+  <!-- 星軌 -->
+  <g opacity="0.85">
+    <path d="M 660 0 C 540 260, 640 520, 560 900" stroke="none" fill="none" id="trailPath"/>
+    <circle cx="660" cy="20" r="1.6" fill="#e8e1d3"/>
+    <circle cx="642" cy="70" r="2" fill="#e8e1d3"/>
+    <circle cx="628" cy="125" r="2.2" fill="#e8e1d3"/>
+    <circle cx="620" cy="185" r="2.6" fill="#e8e1d3"/>
+    <circle cx="616" cy="250" r="3" fill="#e8e1d3"/>
+    <circle cx="612" cy="320" r="3.4" fill="#e8e1d3"/>
+    <circle cx="604" cy="395" r="3.8" fill="#e8e1d3"/>
+    <circle cx="592" cy="470" r="4.2" fill="#e8e1d3"/>
+    <circle cx="580" cy="545" r="4.6" fill="#e8e1d3"/>
+    <circle cx="568" cy="620" r="5" fill="#e8e1d3"/>
+  </g>
+
+  <!-- 黃銅十字星標 -->
+  <g transform="translate(150,340)" stroke="#c9a15a" stroke-width="1.4" opacity="0.9">
+    <line x1="-60" y1="0" x2="60" y2="0"/>
+    <line x1="0" y1="-60" x2="0" y2="60"/>
+    <line x1="-42" y1="-42" x2="42" y2="42"/>
+    <line x1="-42" y1="42" x2="42" y2="-42"/>
+    <circle cx="0" cy="0" r="3.5" fill="#c9a15a" stroke="none"/>
+  </g>
+</svg>
+</div>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="mark"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/ed562609-6ded-4c7a-9981-250f82302b35.jpg" alt="頭貼"></div>
+    <div class="who"><b>friend/諾諾</b> · 自介</div>
+  </div>
+
+  <!-- 分類導航 -->
+  <nav class="chapters">
+    <a href="#s00" class="active"><span class="num">00</span>小自介(?</a>
+    <a href="#s01"><span class="num"></span>社群</a>
+    <a href="#s02"><span class="num"></span>💛Kpop篇</a>
+    <a href="#s03"><span class="num"></span>🧡Vtuber/Other</a>
+    <a href="#s04"><span class="num"></span>💜Jpop/唱見篇</a>
+    <a href="#s05"><span class="num"></span>💙Anime</a>
+    <a href="#s06"><span class="num"></span>🤎Comics(超愛)</a>
+  </nav>
+
+  <main>
+    <!-- Section 0: 小自介 -->
+    <section id="s00">
+      <div class="hero-meta">
+        <span>雜食性動漫追星人</span>
+        <span>Kpop / Vtuber / 二次元 / BL</span>
+      </div>
+      <h1>Friend / 諾諾</h1>
+      <div class="role">大家好~~(⁠◍⁠•⁠ᴗ⁠•⁠◍⁠) 偶是很雜的雜食性動物 🦙🦌🐅🐑🐈‍⬛🐤🐕</div>
+      <p class="tagline">
+        追 Kpop / Vtuber / 動漫 / 漫畫 / 小說 / 廣播劇<br>
+        不拒同擔只要有喜歡的都可以來跟我聊天 我人很好的（？🤣🤣<br>
+        💫BL也看的😎歡迎一起玩www</p>
+      <div class="scroll-hint">往下滑，看更多</div>
+    </section>
+
+    <!-- Section 1: 社群 -->
+    <section id="s01">
+      <div class="sec-grid">
+        <div class="sec-left">
+          <h2 class="section-title">社群帳號</h2>
+          <p>Kpop 和動漫、漫畫、Vtuber、Jpop 活動的 IG 不一樣喔~<br>脆（Threads）的話就是日常ㄎㄧ肖 🤣</p>
+        </div>
+
+        <div class="sec-right">
+          <div class="four-icons">
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/icon-image/medium/threads.png" alt="都講"></div>
+              <div class="four-name">都講</div>
+            </div>
+            <a class="four-item" href="https://www.instagram.com/friend_chasingstars" target="_blank">
+              <div class="four-thumb" style="background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%); padding: 10px;">
+                <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </div>
+              <div class="four-name">Kpop</div>
+            </a>
+            <a class="four-item" href="https://www.instagram.com/summer_crystal13" target="_blank">
+              <div class="four-thumb" style="background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%); padding: 10px;">
+                <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </div>
+              <div class="four-name">二次元</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Kpop篇 -->
+    <section id="s02">
+      <div class="sec-grid">
+        <div class="sec-left">
+          <h2 class="section-title">💛 Kpop篇</h2>
+          <p><b>✨ Ing：</b><br>
+            BTS 2016~ <br>
+            Seventeen 2017~ <br>
+            PLAVE 2023/3~ <br>
+            WEGO-6 2025/4~ <br>
+            MiiWAN 2026/5~<br>
+          </p>
+          <p><b>✨ 目前緩追：</b><br>Super junior、I-DLE、Genblue 2023/6~、SKINZ 2025/4~</p>
+          <p><b>✨ 追一段時間：</b><br>BTOB、Apink、Mamamoo、GOT7、Shinhwa、Alien stage 2023/4</p>
+          <p><b>✨ 小追不深（大多音飯）：</b><br>NMIXX、MONSTA X、Kiss of life、Le sserafim、Kep1er、aespa、ITZY、TXT</p>
+          <p><b>✨ 純音飯：</b><br>IZ*ONE、AKMU</p>
+        </div>
+
+        <div class="sec-right">
+          <div class="four-icons">
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/eb68ee13-3cbe-4948-9381-dd930563a17b.jpg" alt="BTS"></div>
+              <div class="four-name">BTS</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/af4402d8-f731-413a-b264-e95784399ec5.jpg" alt="SVT"></div>
+              <div class="four-name">SVT</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/9889a9a1-5e91-4ed5-b2a6-ffd5ba7d53c0.jpg" alt="PLAVE"></div>
+              <div class="four-name">PLAVE</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/profile_links/four_images/9388aefd-1e6a-4003-9fda-1b446f192543.png" alt="WEGO6"></div>
+              <div class="four-name">WEGO-6</div>
+            </div>
+          </div>
+
+          <div class="yt-box">
+            <div class="yt-box-title">🎵 推推</div>
+            <a class="yt-card" href="https://open.spotify.com/track/4iHYQwgtrY26p2uQG8Nstr?si=2PelhiYvT-SF8oRNn62BPA" target="_blank">
+              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/1e5c1d87-a523-4c38-878b-a03b47000d70.jpg" alt="Blink gone"></div>
+              <div class="yt-meta">
+                <div class="yt-name">Blink gone</div>
+                <div class="yt-sub">Alien stage - Round 7</div>
+              </div>
+            </a>
+            <!-- BTS - NORMAL -->
+<a class="yt-card" href="https://youtu.be/GEk4jHwfFTA" target="_blank">
+  <div class="yt-thumb"><img src="https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg" alt="NORMAL"></div>
+  <div class="yt-meta">
+    <div class="yt-name">NORMAL</div>
+    <div class="yt-sub">BTS (방탄소년단)</div>
+  </div>
+</a>
+<a class="yt-card" href="https://youtu.be/X3kfCfYPjjw" target="_blank">
+  <div class="yt-thumb"><img src="https://img.youtube.com/vi/X3kfCfYPjjw/hqdefault.jpg" alt="NO F.U.N"></div>
+  <div class="yt-meta">
+    <div class="yt-name">NO F.U.N (Kingsman ver.)</div>
+    <div class="yt-sub">SEVENTEEN</div>
+  </div>
+</a>
+
+<!-- PLAVE - Born Savage -->
+<a class="yt-card" href="https://youtu.be/XukB7ZG8CDQ" target="_blank">
+  <div class="yt-thumb"><img src="https://img.youtube.com/vi/XukB7ZG8CDQ/hqdefault.jpg" alt="Born Savage"></div>
+  <div class="yt-meta">
+    <div class="yt-name">Born Savage</div>
+    <div class="yt-sub">PLAVE</div>
+  </div>
+</a>
+
+<!-- PLAVE - Dangerously (Cover) -->
+<a class="yt-card" href="https://youtu.be/NFr8WLzLDJk" target="_blank">
+  <div class="yt-thumb"><img src="https://img.youtube.com/vi/NFr8WLzLDJk/hqdefault.jpg" alt="Dangerously"></div>
+  <div class="yt-meta">
+    <div class="yt-name">Dangerously (Cover)</div>
+    <div class="yt-sub">PLAVE (노아 & 밤비)</div>
+  </div>
+</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Vtuber/Other -->
+    <section id="s03">
+      <div class="sec-grid">
+        <div class="sec-left">
+          <h2 class="section-title">🧡 Vtuber / Other</h2>
+          <p>
+            <b>EN：</b>Nijisanji EN , FSP EN , Shoto<br>
+            <b>JP：</b>Nijisanji JP , ChroNoiR，Voltaction，3SKM , By the beat<br>
+            <b>TW：</b>朔(月蝕屋) 賽特珞(Timaeus) 涅爾菲(Alluria) 諾恪里(CaKano) 阿萬<br>
+            <b>CN：</b>Aza<br>
+            <b>單聽歌：</b>Whale Taylor，AmaLee, Tomoya, U-san, Dacapo
+          </p>
+
+          <p style="margin-top:14px;">
+            <b>KR group (偏愛)：</b><br>
+            • Psychord 싸이코드 (루이쨘 , 하루토)<br>
+            • For the more 포더모어 (별하 , 슈햑)<br>
+            • PJX 피제이엑스 (유럼)<br>
+            • SKOSHISM 스코시즘 (로보 , 오토 , 니노)
+          </p>
+
+          <p>
+            <b>Singers：</b>BL8M、AKUGETSU<br>
+            <b>Other：</b>虛擬偶像(貓耳) Laser、Manta ｜ 🥹 델(frmt)
+          </p>
+        </div>
+
+        <div class="sec-right">
+          <div class="four-icons">
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/a1953463-f9c4-42df-a79e-b05bcc73f956.jpg" alt="Luxiem"></div>
+              <div class="four-name">Luxiem</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://pbs.twimg.com/media/FabguyQagAAaDH2.jpg" alt="ChroNoiR"></div>
+              <div class="four-name">ChroNoiR</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="impact.png" alt="VOLTACTION × 3SKM"></div>
+              <div class="four-name">VOLTACTION × 3SKM</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://cdn.sounova.com/upload/hlwUonI1YxWnGwACvDip5.webp" alt="BY THE BEAT"></div>
+              <div class="four-name">By the beat</div>
+            </div>
+          </div>
+
+          <div class="yt-box">
+            <div class="yt-box-title">🎵 推推</div>
+            <a class="yt-card" href="https://youtu.be/D66eHXt19dY?si=FC4S26JzhJXQAGKl" target="_blank">
+              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/1400fef2-b4b1-422b-832a-1004bb94c49c.jpg" alt="Jazz on the clock"></div>
+              <div class="yt-meta">
+                <div class="yt-name">Jazz on the clock</div>
+                <div class="yt-sub">Luxiem</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/JZIbfLeWiWY?si=17v1USqF8Q19LCVb" target="_blank">
+              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/74f7e042-30fd-47ed-ab31-3e783f2853df.jpg" alt="病名は愛だった"></div>
+              <div class="yt-meta">
+                <div class="yt-name">病名は愛だった</div>
+                <div class="yt-sub">Vezalius Bandage</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/qJlkfJj4pds?si=FfkV4_SsF-D7yl7Q" target="_blank">
+              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/998e6e2d-26a3-4f8a-8dba-bc7af48e5c6c.jpg" alt="迷醉 Sangria"></div>
+              <div class="yt-meta">
+                <div class="yt-name">迷醉 Sangria</div>
+                <div class="yt-sub">朔Sakuro</div>
+              </div>
+            </a>
+            <!-- Cetro賽特珞 x Sid東東 - 降珞 -->
+<a class="yt-card" href="https://youtu.be/Vi6kykFZhnI" target="_blank">
+  <div class="yt-thumb"><img src="https://img.youtube.com/vi/Vi6kykFZhnI/hqdefault.jpg" alt="降珞"></div>
+  <div class="yt-meta">
+    <div class="yt-name">降珞</div>
+    <div class="yt-sub">Cetro賽特珞 x Sid東東</div>
+  </div>
+</a>
+            <a class="yt-card" href="https://youtu.be/2TqgQ2WzAwk?si=AHb4OLZTM19hMsGl" target="_blank">
+              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/2dcfe914-6494-43de-b150-8e9d8263a054.jpg" alt="Many Many More"></div>
+              <div class="yt-meta">
+                <div class="yt-name">Many Many More</div>
+                <div class="yt-sub">Cassian Floros</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Jpop/唱見篇 -->
+    <section id="s04">
+      <div class="sec-grid">
+        <div class="sec-left">
+          <h2 class="section-title">💜 Jpop / 唱見篇</h2>
+          <p><b>✨ 團體：</b><br>
+            • <b>EL6</b>（春希💜、832💛）<br>
+            • <b>Paradox Live</b>（BAE）<br>
+            • <b>FouRTe Project</b>（ARTE ROBERTO）<br>
+            • <b>UniteUp!</b><br>
+            • <b>HoneyWorks</b><br>
+            • <b>Seven's Proud</b>🥹
+          </p>
+          <p style="margin-top: 18px;"><b>✨ 歌手：</b><br>
+            Hana、Ado、YOASOBI、96貓、天月、Yupsilon、nqrse、Natori、Centimillimental 溫詞
+          </p>
+        </div>
+
+        <div class="sec-right">
+          <div class="four-icons">
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://i.kfs.io/article5/global/59,2268,12v1/original.jpg" alt="Hana"></div>
+              <div class="four-name">Hana</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://images.genius.com/257f7ab8d95055a48f5eb9ef6c9ebb12.1000x1000x1.png" alt="EL6"></div>
+              <div class="four-name">Element Sicks</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://p2.bahamut.com.tw/HOME/creationCover/82/0006227482_B.JPG" alt="FouRTe Project"></div>
+              <div class="four-name">FouRTe Project</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://www.happylife40.com/wp-content/uploads/2024/05/2024-05-30_12h07_27.jpg" alt="Seven's Proud"></div>
+              <div class="four-name">Seven's Proud</div>
+            </div>
+          </div>
+        
+          <div class="yt-box">
+            <div class="yt-box-title">🎵 推推</div>
+            <a class="yt-card" href="https://youtu.be/-2I7hb7DGk4?si=y59rP-BYtK7-fglh" target="_blank">
+              <div class="yt-thumb"><img src="https://img.youtube.com/vi/-2I7hb7DGk4/hqdefault.jpg" alt="Rap Guerrilla Reload"></div>
+              <div class="yt-meta">
+                <div class="yt-name">Rap Guerrilla Reload</div>
+                <div class="yt-sub">Paradox Live</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/p4vxaQ7n3nY?si=xiDYfBMx5iGttV90" target="_blank">
+              <div class="yt-thumb"><img src="https://img.youtube.com/vi/p4vxaQ7n3nY/hqdefault.jpg" alt="TOKI"></div>
+              <div class="yt-meta">
+                <div class="yt-name">TOKI (LIVE映像)</div>
+                <div class="yt-sub">Element Sicks【EL6】</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/GNV-FRcONeY?si=HCcrlA0xDUUZh_At" target="_blank">
+              <div class="yt-thumb"><img src="https://img.youtube.com/vi/GNV-FRcONeY/hqdefault.jpg" alt="Addict."></div>
+              <div class="yt-meta">
+                <div class="yt-name">Addict.</div>
+                <div class="yt-sub">Element Sicks【EL6】</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/rGPd0FyjQ9w?si=XfyF_2GA28eCV_Va" target="_blank">
+              <div class="yt-thumb"><img src="https://img.youtube.com/vi/rGPd0FyjQ9w/hqdefault.jpg" alt="ROSE"></div>
+              <div class="yt-meta">
+                <div class="yt-name">ROSE</div>
+                <div class="yt-sub">HANA</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/J3IkxLOgolg?si=zzVr0EzZRfWfRvmA" target="_blank">
+              <div class="yt-thumb"><img src="https://img.youtube.com/vi/J3IkxLOgolg/hqdefault.jpg" alt="キミがキミでキミだから"></div>
+              <div class="yt-meta">
+                <div class="yt-name">キミがキミでキミだから</div>
+                <div class="yt-sub">FouRTe Project</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Anime -->
+    <section id="s05">
+      <div class="sec-grid">
+        <div class="sec-left">
+          <h2 class="section-title">💙 Anime</h2>
+          <p><b>🏐 運動：</b><br>
+          排球少年、藍色監獄、Free!!!男子游泳部、弦音風舞高中弓道部、後空翻少年、RE-MAIN、花漾滑冰</p>
+          <p><b>💥 戰鬥：</b><br>
+          WIND BREAKER—防風少年、咒術迴戰、鬼滅之刃、怪獸8號、文豪野犬、地獄樂、血界戰線、桃源暗鬼、夜櫻家大作戰、暗殺教室、我獨自升級、龍族、擅長逃跑的殿下、將國戡亂記</p>
+          <p><b>🌸 戀愛、BL與校園：</b><br>
+          Given被贈與的未來、魔道祖師、天官賜福、時光代理人、堀與宮村、指尖相觸戀戀不捨、式守同學不只可愛而已、去參加聯誼 卻發現完全沒有女生在場、現在是哪一個多聞、櫻蘭高校男公關、赤髮白雪姬、魔法水果籃、玩偶遊戲、愛麗絲學園、A3!、月歌</p>
+          <p><b>⚔️ 轉生或冒險：</b><br>
+          關於我轉生成史萊姆這檔事、無職轉生、在地下城尋求邂逅是否搞錯了什麼、遊戲人生、魔王學院的不適任者、肌肉魔法使、轉生貴族憑鑑定技能扭轉人生、治癒魔法的錯誤使用法、七魔劍支配天下、在異世界獲得超強能力的我在現實世界照樣無敵、秒殺外掛太強了異世界的傢伙們根本就不是對手、英雄王為了窮盡武道而轉生而後成為世界最強見習騎士、不相信人類的冒險者們好像要去拯救世界、聖者無雙上班族的異世界生存之道、仙王</p>
+          <p><b>🏰 惡役千金和女性向奇幻：</b><br>
+          輪迴七次的惡役千金在前敵國享受隨心所欲的新婚生活、轉生成女性向遊戲只有毀滅END的壞人大小姐、因為是反派大小姐所以養了魔王、成為悲劇元兇的最強異端最後頭目女王為了人民犧牲、轉生公主與天才千金的魔法革命、聖女魔力無所不能、銀砂糖師與黑妖精
+          </p>
+          <p><b>🌿 奇幻神怪與療癒日常：</b><br>
+          葬送的芙莉蓮、紫羅蘭永恆花園、藥師少女的獨語、憂國的莫里亞蒂、瓦尼塔斯的手札、約定的夢幻島、黑暗集會、物之古物奇譚（物物語）、綾島奇譚、未聞花名、擁有超常技能的異世界流浪美食家、異世界悠閒紀行~邊養娃邊當冒險者、異世界藥局、組長女兒與保母、學員奶爸、兩不疑</p>
+        </div>
+
+        <div class="sec-right">
+          <div class="four-icons">
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/b78859b7-3a3e-4401-979a-51cded3722ed.jpg" alt="蘇枋隼飛"></div>
+              <div class="four-name">蘇枋隼飛</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/eb7cc3b9-3ec0-404e-8162-a456c6367452.jpg" alt="北條時行"></div>
+              <div class="four-name">北條時行</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/7b175571-d038-49f8-b9fa-a2579d202f9c.jpg" alt="壬氏"></div>
+              <div class="four-name">壬氏</div>
+            </div>
+            <div class="four-item">
+              <div class="four-thumb"><img src="https://prd.storage.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/1b17b95f-02c2-48e5-b48d-52c7e19fafae.jpg" alt="七瀨遙"></div>
+              <div class="four-name">七瀨遙</div>
+            </div>
+          </div>
+
+          <div class="yt-box">
+            <div class="yt-box-title">🎵 推推</div>
+            <a class="yt-card" href="https://youtu.be/VKviyEGvb94?si=i55nISWppPD6nqSm" target="_blank">
+              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/761c1bb2-d1ce-45fd-97c9-3e9558052718.jpg" alt="Fly high"></div>
+              <div class="yt-meta">
+                <div class="yt-name">Fly high</div>
+                <div class="yt-sub">排球少年</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/LFoyXEFaz2Q?si=pemrHPsjE0hos5E7" target="_blank">
+              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/0bfd57e4-133d-499e-a48e-18412d81ff20.jpg" alt="絕對零度"></div>
+              <div class="yt-meta">
+                <div class="yt-name">絕對零度</div>
+                <div class="yt-sub">Natori</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/oe4XJ851oOk?si=N3d90tln4lAyIAiu" target="_blank">
+              <div class="yt-thumb"><img src="https://img.youtube.com/vi/oe4XJ851oOk/hqdefault.jpg" alt="ReawakeR"></div>
+              <div class="yt-meta">
+                <div class="yt-name">ReawakeR</div>
+                <div class="yt-sub">LiSA feat. Felix</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/qvk4Rl7r2GY?si=8fS86O0IDsSjmkhm" target="_blank">
+              <div class="yt-thumb"><img src="https://img.youtube.com/vi/qvk4Rl7r2GY/hqdefault.jpg" alt="百花繚乱"></div>
+              <div class="yt-meta">
+                <div class="yt-name">百花繚乱</div>
+                <div class="yt-sub">幾田りら</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/NLIGDjKBLY0?si=mny9obFwQ-_0QM8p" target="_blank">
+              <div class="yt-thumb"><img src="https://img.youtube.com/vi/NLIGDjKBLY0/hqdefault.jpg" alt="革命道中 - On The Way"></div>
+              <div class="yt-meta">
+                <div class="yt-name">革命道中</div>
+                <div class="yt-sub">アイナ・ジ・エンド</div>
+              </div>
+            </a>
+            <a class="yt-card" href="https://youtu.be/dYzgZVhiqmU?si=6uHgXgNXjfuTFFal" target="_blank">
+              <div class="yt-thumb"><img src="https://img.youtube.com/vi/dYzgZVhiqmU/hqdefault.jpg" alt="Ｗ●ＲＫ"></div>
+              <div class="yt-meta">
+                <div class="yt-name">Ｗ●ＲＫ</div>
+                <div class="yt-sub">MILLENNIUM PARADE × 椎名林檎</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Comics -->
+    <section id="s06">
+      <div class="sec-grid">
+         <div class="sec-left">
+          <h2 class="section-title">🤎 Comics (超愛)</h2>
+          <p><b>✨ 好看：</b><br>
+          某天成為公主、今生我來當家主、青梅竹馬情結、公會裡的偶像大大、先育兒再戀愛、誤打誤撞成為天才怪物演員、音樂天才：重生的樂章、穿越者的專屬特權、戀愛的季節、童畫之夢、各自倒數的那天、鳳凰涅槃</p>
+          <p><b>✨ 刺激：</b><br>
+          劍尊歸來、我培育的S級們、變成伯爵家的混混、史詩級領地設計師、末日前的退休計畫、全知讀者視角、被塔詛咒的獵人
+          <p style="margin-top: 14px;"><b>✨ BL ：</b><br>
+          水邊之夜、Given、落花池、定義關係、Sketch、16647、愛情往返、紅線挑戰、1995青春報告、梨花綻放的愛戀、Omega complex、卡麥納&amp;卡普里、自我中心的思考方式、我的室友帥哥學長、週五失戀聯盟</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>© FRIEND / 諾諾 — 自介</span>
+    </footer>
+  </main>
+
+<script>
+  const links = document.querySelectorAll('.chapters a');
+  const sections = document.querySelectorAll('section');
+  let ticking = false;
+
+  const navObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting && !ticking){
+        ticking = true;
+        requestAnimationFrame(()=>{
+          const active = document.querySelector('.chapters a[href="#'+entry.target.id+'"]');
+          if(active && !active.classList.contains('active')){
+            links.forEach(l=>l.classList.remove('active'));
+            active.classList.add('active');
+            active.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+          }
+          ticking = false;
+        });
+      }
+    });
+  }, { threshold: 0.35 });
+
+  sections.forEach(s=>navObserver.observe(s));
+</script>
+</body>
+</html>
