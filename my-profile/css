@@ -1,0 +1,108 @@
+/* 4格小圖容器 */
+  .four-thumb{
+    width: 100%;
+    aspect-ratio: 1 / 1;          /* 強制 1:1 正方形 */
+    border-radius: 16px;
+    overflow: hidden;             /* 超出正方形範圍自動遮罩裁切 */
+    background: #000;
+    border: 1px solid rgba(201,161,90,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;           /* 確保子元素定位正確 */
+    transition: transform .15s ease, border-color .15s ease;
+  }
+
+  /* 4格小圖內的圖片（關鍵修正） */
+  .four-thumb img{ 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover;            /* 填滿且不變形 */
+    display: block; 
+  }
+
+/* ---------- 精簡社群按鈕 (對齊 4 格圖示大小) ---------- */
+  .social-icon-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .social-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* 縮小為與其他四格圖示一致的尺寸與圓角 */
+  .social-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  /* 預設樣式 */
+  .social-box.threads {
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+
+  .social-box.ig {
+    background: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #666;
+  }
+
+  /* 圖示向量縮小 */
+  .social-box svg {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+    display: block;
+  }
+
+  .social-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ivory);
+    transition: color 0.2s ease;
+  }
+
+  /* ---------- 點擊/懸停 反白效果 ---------- */
+  .social-item:hover .social-box,
+  .social-item:active .social-box {
+    transform: translateY(-2px);
+  }
+
+  /* Threads 點擊反白為白底黑字 */
+  .social-item:hover .social-box.threads,
+  .social-item:active .social-box.threads {
+    background: #fff;
+    border-color: #fff;
+    color: #000;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+
+  /* IG 點擊反轉為金色深底 */
+  .social-item:hover .social-box.ig,
+  .social-item:active .social-box.ig {
+    background: var(--ink-2);
+    border-color: var(--brass);
+    color: var(--brass);
+    box-shadow: 0 0 10px rgba(201, 161, 90, 0.4);
+  }
+
+  .social-item:hover .social-name,
+  .social-item:active .social-name {
+    color: var(--brass);
+  }
