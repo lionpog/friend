@@ -121,9 +121,7 @@
     border-radius: 2px;
     transition: color .15s ease, border-color .15s ease, background .15s ease;
   }
-  .chapters a .num{ font-size:10px; color:var(--brass-dim); }
   .chapters a.active{ color:var(--ivory); border-color:var(--brass); background:var(--ink-2); }
-  .chapters a.active .num{ color:var(--brass); }
 
   /* ---------- 區塊佈局 ---------- */
   main{ max-width: 1160px; margin: 0 auto; }
@@ -143,7 +141,7 @@
   .sec-right{
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
     width: 100%;
   }
 
@@ -186,18 +184,11 @@
     padding-left:16px;
     max-width: 700px;
   }
-  .scroll-hint{
-    margin-top: 36px;
-    font-size:11px; color:var(--brass-dim);
-    display:flex; align-items:center; gap:8px;
-  }
-  .scroll-hint::after{ content:"↓"; animation: bob 1.6s ease-in-out infinite; }
-  @keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(4px);} }
 
   h2.section-title{ font-size:26px; margin-top:8px; margin-bottom: 14px; }
   p{ color:var(--ivory); font-size:15px; margin: 12px 0; }
 
-  /* 4格小圖 (文字完整顯示、自動換行) */
+  /* 4格小圖 */
   .four-icons{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -243,86 +234,265 @@
     max-width: 100%;
   }
 
-  /* YouTube / 推薦歌曲 Card */
-  .yt-box{
+  /* ---------- 點擊跳出彈窗查看卡片 ---------- */
+  .detail-card {
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+  }
+  .detail-card:hover {
+    border-color: var(--brass);
+    background: var(--ink-3);
+    transform: translateX(4px);
+  }
+  .detail-card-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ivory);
+  }
+  .detail-card-desc {
+    font-size: 12px;
+    color: var(--stone);
+    margin-top: 2px;
+  }
+  .detail-card-arrow {
+    color: var(--brass);
+    font-size: 13px;
+    margin-left: 10px;
+    white-space: nowrap;
+  }
+
+  /* ---------- 彈窗視窗 (Modal) ---------- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .modal-window {
+    background: var(--ink-2);
+    border: 1px solid var(--brass);
+    border-radius: 12px;
+    max-width: 520px;
+    width: 100%;
+    padding: 24px 28px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.85);
+    transform: translateY(20px);
+    transition: transform 0.25s ease;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal-overlay.active .modal-window {
+    transform: translateY(0);
+  }
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--stone);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .modal-close:hover { color: var(--brass); }
+  .modal-title {
+    font-size: 18px;
+    color: var(--brass);
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    font-weight: 700;
+  }
+  .modal-body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ivory);
+  }
+
+  /* ---------- 滾動歌曲輪播 (Carousel) ---------- */
+  .carousel-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    width: 100%;
+    margin-top: 4px;
   }
-  .yt-box-title{
+  .carousel-header {
     font-size: 10px;
     letter-spacing: .12em;
     color: var(--stone);
     text-transform: uppercase;
   }
-  .yt-card{
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 10px;
-    background: var(--ink-2);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    transition: border-color .15s ease, background .15s ease;
-  }
-  .yt-card:active,
-  .yt-card:hover{
-    border-color: var(--brass);
-    background: var(--ink-3);
-  }
-  .yt-thumb{
-    width: 44px;
-    height: 44px;
-    border-radius: 4px;
+  .carousel-viewport {
+    width: 100%;
     overflow: hidden;
-    flex-shrink: 0;
     position: relative;
-    background: #111;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--ink-2);
   }
-  .yt-thumb img{ width: 100%; height: 100%; object-fit: cover; }
-  .yt-thumb::after{
+  .carousel-track {
+    display: flex;
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 100%;
+  }
+  .carousel-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .slide-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    background: #000;
+  }
+  .slide-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .slide-img-wrap::after {
     content: "▶";
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 22px;
     color: #fff;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.35);
+    transition: background 0.2s;
   }
-  .yt-meta{ flex: 1; min-width: 0; }
-  .yt-name{
-    font-size: 13px;
+  .carousel-slide:hover .slide-img-wrap::after {
+    background: rgba(0,0,0,0.15);
+  }
+  .slide-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .slide-title {
+    font-size: 14px;
     font-weight: 600;
     color: var(--ivory);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .yt-sub{
+  .slide-sub {
     font-size: 11px;
     color: var(--stone);
-    margin-top: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-top: 2px;
   }
 
-  .tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top: 12px; }
-  .tag{
-    font-size:12px; padding:4px 10px; border:1px solid var(--line);
-    color:var(--ivory); background:var(--ink-2); border-radius: 2px;
+  /* ---------- 純文字風格滾動輪播卡片 (無圖片版) ---------- */
+  .carousel-slide.text-card-slide {
+    padding: 24px 18px;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(145deg, var(--ink-2), var(--ink-3));
+    border-radius: 10px;
+    transition: background .2s ease;
+  }
+  .carousel-slide.text-card-slide:hover {
+    background: var(--ink-3);
+  }
+  .comic-badge {
+    font-size: 11px;
+    color: var(--brass-dim);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .text-card-slide .slide-title {
+    font-size: 17px;
+    color: var(--ivory);
+    margin-bottom: 6px;
+  }
+  .comic-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--brass);
+    border-bottom: 1px dashed var(--brass-dim);
+    padding-bottom: 2px;
   }
 
-  .stamp{
-    font-size:15px;
-    color:var(--brass); border:1px solid var(--line); padding:18px;
-    position:relative;
+  /* 輪播控制器 (Prev - 菱形點 - Next) */
+  .carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 4px;
   }
-  .stamp::before{
-    content:"“"; position:absolute; top:-8px; left:12px; font-size:36px;
-    color:var(--brass-dim); 
+  .carousel-btn {
+    background: none;
+    border: none;
+    color: var(--stone);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    transition: color 0.2s ease;
+  }
+  .carousel-btn:hover { color: var(--brass); }
+  .carousel-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 180px;
+  }
+  .carousel-dot {
+    width: 7px;
+    height: 7px;
+    border: 1px solid var(--brass-dim);
+    transform: rotate(45deg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .carousel-dot.active {
+    background: var(--brass);
+    border-color: var(--brass);
+    transform: rotate(45deg) scale(1.2);
   }
 
   footer{
@@ -476,13 +646,13 @@
 
   <!-- 分類導航 -->
   <nav class="chapters">
-    <a href="#s00" class="active"><span class="num"></span>小自介(?</a>
-    <a href="#s01"><span class="num"></span>社群</a>
-    <a href="#s02"><span class="num"></span>💛Kpop篇</a>
-    <a href="#s03"><span class="num"></span>🧡Vtuber/Other</a>
-    <a href="#s04"><span class="num"></span>💜Jpop/唱見篇</a>
-    <a href="#s05"><span class="num"></span>💙Anime</a>
-    <a href="#s06"><span class="num"></span>🤎Comics(超愛)</a>
+    <a href="#s00" class="active"><span class="num">00</span>小自介(?</a>
+    <a href="#s01"><span class="num">01</span>社群</a>
+    <a href="#s02"><span class="num">02</span>💛Kpop篇</a>
+    <a href="#s03"><span class="num">03</span>🧡Vtuber/Other</a>
+    <a href="#s04"><span class="num">04</span>💜Jpop/唱見篇</a>
+    <a href="#s05"><span class="num">05</span>💙Anime</a>
+    <a href="#s06"><span class="num">06</span>🤎Comics(超愛)</a>
   </nav>
 
   <main>
@@ -536,17 +706,30 @@
       <div class="sec-grid">
         <div class="sec-left">
           <h2 class="section-title">💛 Kpop篇</h2>
-          <p><b>✨ Ing：</b><br>
-            BTS 2016~ <br>
-            Seventeen 2017~ <br>
-            PLAVE 2023/3~ <br>
-            WEGO-6 2025/4~ <br>
-            MiiWAN 2026/5~<br>
-          </p>
-          <p><b>✨ 目前緩追：</b><br>Super junior、I-DLE、Genblue 2023/6~、SKINZ 2025/4~</p>
-          <p><b>✨ 追一段時間：</b><br>BTOB、Apink、Mamamoo、GOT7、Shinhwa、Alien stage 2023/4</p>
-          <p><b>✨ 小追不深（大多音飯）：</b><br>NMIXX、MONSTA X、Kiss of life、Le sserafim、Kep1er、aespa、ITZY、TXT</p>
-          <p><b>✨ 純音飯：</b><br>IZ*ONE、AKMU</p>
+
+          <div class="detail-card" onclick="openModal('kpop-ing')">
+            <div>
+              <div class="detail-card-title">Ing</div>
+              <div class="detail-card-desc">BTS、Seventeen、PLAVE、WEGO-6...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('kpop-slow')">
+            <div>
+              <div class="detail-card-title">緩追 / 追過一段時間</div>
+              <div class="detail-card-desc">Super junior、I-DLE、BTOB、Mamamoo...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('kpop-listener')">
+            <div>
+              <div class="detail-card-title">小追不深（大多音飯）</div>
+              <div class="detail-card-desc">NMIXX、MONSTA X、Kiss of life、aespa...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
         </div>
 
         <div class="sec-right">
@@ -569,48 +752,115 @@
             </div>
           </div>
 
-          <div class="yt-box">
-            <div class="yt-box-title">🎵 推推</div>
-            <a class="yt-card" href="https://open.spotify.com/track/4iHYQwgtrY26p2uQG8Nstr?si=2PelhiYvT-SF8oRNn62BPA" target="_blank">
-              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/1e5c1d87-a523-4c38-878b-a03b47000d70.jpg" alt="Blink gone"></div>
-              <div class="yt-meta">
-                <div class="yt-name">Blink gone</div>
-                <div class="yt-sub">Alien stage - Round 7</div>
+          <!-- 滾動推薦歌曲 (Carousel) -->
+          <div class="carousel-wrapper" id="carousel-kpop">
+            <div class="carousel-header">🎵 推推歌曲</div>
+            <div class="carousel-viewport">
+              <div class="carousel-track">
+                
+                <a class="carousel-slide" href="https://youtu.be/GEk4jHwfFTA" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg" alt="NORMAL"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">NORMAL</div>
+                    <div class="slide-sub">BTS (방탄소년단)</div>
+                  </div>
+                </a>
+                <!-- 1. BTS (방탄소년단) - Save ME -->
+<a class="carousel-slide" href="https://youtu.be/GZjt_sA2eso?si=QSfYYcVT4c2vEwT6" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/GZjt_sA2eso/hqdefault.jpg" alt="Save ME"></div>
+  <div class="slide-info">
+    <div class="slide-title">Save ME</div>
+    <div class="slide-sub">BTS (방탄소년단)</div>
+  </div>
+</a>
+
+<!-- 2. BTS (방탄소년단) - Lights -->
+<a class="carousel-slide" href="https://youtu.be/eaUpme4jalE?si=dQtZWiyiE4rNw6gY" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/eaUpme4jalE/hqdefault.jpg" alt="Lights"></div>
+  <div class="slide-info">
+    <div class="slide-title">Lights</div>
+    <div class="slide-sub">BTS (방탄소년단)</div>
+  </div>
+</a>
+
+<!-- 3. BTS (방탄소년단) - Don't Leave Me -->
+<a class="carousel-slide" href="https://youtu.be/Cz6BUM4F2tY?si=4Vhug5U6tLqaiwjh" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/Cz6BUM4F2tY/hqdefault.jpg" alt="Don't Leave Me"></div>
+  <div class="slide-info">
+    <div class="slide-title">Don't Leave Me</div>
+    <div class="slide-sub">BTS (방탄소년단)</div>
+  </div>
+</a>
+                <a class="carousel-slide" href="https://youtu.be/X3kfCfYPjjw" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/X3kfCfYPjjw/hqdefault.jpg" alt="NO F.U.N"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">NO F.U.N (Kingsman ver.)</div>
+                    <div class="slide-sub">SEVENTEEN</div>
+                  </div>
+                </a>
+                
+                <!-- 1. PLAVE (플레이브) - 여섯 번째 여름 (The 6th Summer) -->
+<a class="carousel-slide" href="https://youtu.be/c_yCRwh97M8?si=rtmhAxWRr-QVnEla" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/c_yCRwh97M8/hqdefault.jpg" alt="여섯 번째 여름 (The 6th Summer)"></div>
+  <div class="slide-info">
+    <div class="slide-title">여섯 번째 여름 (The 6th Summer)</div>
+    <div class="slide-sub">PLAVE (플레이브)</div>
+  </div>
+</a>
+
+<!-- 2. PLAVE (플레이브) - Dash -->
+<a class="carousel-slide" href="https://youtu.be/b3GoZMfHJT4?si=91QZmZfWg0GJwatn" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/b3GoZMfHJT4/hqdefault.jpg" alt="Dash"></div>
+  <div class="slide-info">
+    <div class="slide-title">Dash</div>
+    <div class="slide-sub">PLAVE (플레이브)</div>
+  </div>
+</a>
+                <a class="carousel-slide" href="https://youtu.be/XukB7ZG8CDQ" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/XukB7ZG8CDQ/hqdefault.jpg" alt="Born Savage"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">Born Savage</div>
+                    <div class="slide-sub">PLAVE</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/NFr8WLzLDJk" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/NFr8WLzLDJk/hqdefault.jpg" alt="Dangerously"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">Dangerously (Cover)</div>
+                    <div class="slide-sub">PLAVE (노아 & 밤比)</div>
+                  </div>
+                </a>
+                <!-- 3. PLAVE (노아 & 하민) - Love me or Leave me (Cover) -->
+<a class="carousel-slide" href="https://youtu.be/u1Wp2coFDB4?si=k2NeTG3oVO-BbhCF" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/u1Wp2coFDB4/hqdefault.jpg" alt="Love me or Leave me"></div>
+  <div class="slide-info">
+    <div class="slide-title">Love me or Leave me (Cover)</div>
+    <div class="slide-sub">PLAVE (노아 & 밤비)</div>
+  </div>
+</a>
+
+<!-- 4. SKINZ (스킨즈) - Poison Ivy -->
+<a class="carousel-slide" href="https://youtu.be/9MSkAK58J7I?si=s19VHrT5PctafOwh" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/9MSkAK58J7I/hqdefault.jpg" alt="Poison Ivy"></div>
+  <div class="slide-info">
+    <div class="slide-title">Poison Ivy</div>
+    <div class="slide-sub">SKINZ (스킨즈)</div>
+  </div>
+</a>
+<a class="carousel-slide" href="https://open.spotify.com/track/4iHYQwgtrY26p2uQG8Nstr?si=2PelhiYvT-SF8oRNn62BPA" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/1e5c1d87-a523-4c38-878b-a03b47000d70.jpg" alt="Blink gone"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">Blink gone</div>
+                    <div class="slide-sub">Alien stage - Round 7</div>
+                  </div>
+                </a>
               </div>
-            </a>
-            <!-- BTS - NORMAL -->
-<a class="yt-card" href="https://youtu.be/GEk4jHwfFTA" target="_blank">
-  <div class="yt-thumb"><img src="https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg" alt="NORMAL"></div>
-  <div class="yt-meta">
-    <div class="yt-name">NORMAL</div>
-    <div class="yt-sub">BTS (방탄소년단)</div>
-  </div>
-</a>
-<a class="yt-card" href="https://youtu.be/X3kfCfYPjjw" target="_blank">
-  <div class="yt-thumb"><img src="https://img.youtube.com/vi/X3kfCfYPjjw/hqdefault.jpg" alt="NO F.U.N"></div>
-  <div class="yt-meta">
-    <div class="yt-name">NO F.U.N (Kingsman ver.)</div>
-    <div class="yt-sub">SEVENTEEN</div>
-  </div>
-</a>
-
-<!-- PLAVE - Born Savage -->
-<a class="yt-card" href="https://youtu.be/XukB7ZG8CDQ" target="_blank">
-  <div class="yt-thumb"><img src="https://img.youtube.com/vi/XukB7ZG8CDQ/hqdefault.jpg" alt="Born Savage"></div>
-  <div class="yt-meta">
-    <div class="yt-name">Born Savage</div>
-    <div class="yt-sub">PLAVE</div>
-  </div>
-</a>
-
-<!-- PLAVE - Dangerously (Cover) -->
-<a class="yt-card" href="https://youtu.be/NFr8WLzLDJk" target="_blank">
-  <div class="yt-thumb"><img src="https://img.youtube.com/vi/NFr8WLzLDJk/hqdefault.jpg" alt="Dangerously"></div>
-  <div class="yt-meta">
-    <div class="yt-name">Dangerously (Cover)</div>
-    <div class="yt-sub">PLAVE (노아 & 밤비)</div>
-  </div>
-</a>
+            </div>
+            <div class="carousel-controls">
+              <button class="carousel-btn prev-btn">‹ Prev</button>
+              <div class="carousel-dots"></div>
+              <button class="carousel-btn next-btn">Next ›</button>
+            </div>
           </div>
         </div>
       </div>
@@ -621,45 +871,30 @@
       <div class="sec-grid">
         <div class="sec-left">
           <h2 class="section-title">🧡 Vtuber / Other</h2>
-        <p><b>EN：</b><br>
-            • <b>Nijisanji EN</b><br>
-            • <b>FSP EN</b><br>
-            • <b>Shoto</b><br>
-          </p>
-          <p style="margin-top: 18px;"><b>JP：</b><br>
-            • <b>Nijisanji JP</b><br>
-            • <b>Voltaction</b><br>
-            • <b>3SKM</b><br>
-            • <b>By the beat</b><br>
-          </p>
-          <p style="margin-top: 18px;"><b>TW：</b><br>
-            • <b>朔</b> (月蝕屋)<br>
-            • <b>賽特珞</b> (Timaeus)<br>
-            • <b>涅爾菲</b> (Alluria)<br>
-            • <b>諾恪里</b> (CaKano)<br>
-            • <b>阿萬</b><br>
-          </p>
-          <p style="margin-top: 18px;"><b>CN：</b>Aza<br></p>
-          <p style="margin-top: 18px;"><b>單聽歌：</b><br>
-            • <b>Whale Taylor</b><br>
-            • <b>U-san</b><br>
-            • <b>AmaLee</b><br>
-            • <b>Dacapo</b><br>
-            • <b>Tomoya</b><br>
-          </p>
-          <p style="margin-top: 18px;"><b>KR group (偏愛)：</b><br>
-            • <b>Psychord 싸이코드</b> (루이쨘、하루토)<br>
-            • <b>For the more 포더모어</b> (별하、슈햑)<br>
-            • <b>PJX 피제이엑스</b> (유럼)<br>
-            • <b>SKOSHISM 스코시즘</b> (로보、오토、니노)<br>
-            • <b>UNDAYS</b> (쿠로、세이)<br>
-            • <b>IVNIT 이브닛</b> (한결、u32)<br>
-            • <b>IRISÉ</b><br>
-          </p>
-          <p>
-            <b>Singers：</b>BL8M、AKUGETSU<br>
-            <b>Other：</b>Laser、Manta、델(frmt)🥹 
-          </p>
+
+          <div class="detail-card" onclick="openModal('vt-global')">
+            <div>
+              <div class="detail-card-title">✨EN / JP / TW / CN</div>
+              <div class="detail-card-desc">Nijisanji、Voltaction、3SKM、月蝕屋...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('vt-kr')">
+            <div>
+              <div class="detail-card-title">✨KR group (偏愛)</div>
+              <div class="detail-card-desc">Psychord、For the more、SKOSHISM、UNDAYS...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('vt-singers')">
+            <div>
+              <div class="detail-card-title">✨單聽歌 &amp; Singers &amp; Other</div>
+              <div class="detail-card-desc">Whale Taylor、AmaLee、BL8M、델(frmt)...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
         </div>
 
         <div class="sec-right">
@@ -682,44 +917,159 @@
             </div>
           </div>
 
-          <div class="yt-box">
-            <div class="yt-box-title">🎵 推推</div>
-            <a class="yt-card" href="https://youtu.be/D66eHXt19dY?si=FC4S26JzhJXQAGKl" target="_blank">
-              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/1400fef2-b4b1-422b-832a-1004bb94c49c.jpg" alt="Jazz on the clock"></div>
-              <div class="yt-meta">
-                <div class="yt-name">Jazz on the clock</div>
-                <div class="yt-sub">Luxiem</div>
-              </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/JZIbfLeWiWY?si=17v1USqF8Q19LCVb" target="_blank">
-              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/74f7e042-30fd-47ed-ab31-3e783f2853df.jpg" alt="病名は愛だった"></div>
-              <div class="yt-meta">
-                <div class="yt-name">病名は愛だった</div>
-                <div class="yt-sub">Vezalius Bandage</div>
-              </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/qJlkfJj4pds?si=FfkV4_SsF-D7yl7Q" target="_blank">
-              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/998e6e2d-26a3-4f8a-8dba-bc7af48e5c6c.jpg" alt="迷醉 Sangria"></div>
-              <div class="yt-meta">
-                <div class="yt-name">迷醉 Sangria</div>
-                <div class="yt-sub">朔Sakuro</div>
-              </div>
-            </a>
-            <!-- Cetro賽特珞 x Sid東東 - 降珞 -->
-<a class="yt-card" href="https://youtu.be/Vi6kykFZhnI" target="_blank">
-  <div class="yt-thumb"><img src="https://img.youtube.com/vi/Vi6kykFZhnI/hqdefault.jpg" alt="降珞"></div>
-  <div class="yt-meta">
-    <div class="yt-name">降珞</div>
-    <div class="yt-sub">Cetro賽特珞 x Sid東東</div>
+          <!-- 滾動推薦歌曲 (Carousel) -->
+          <div class="carousel-wrapper" id="carousel-vt">
+            <div class="carousel-header">🎵 推推歌曲</div>
+            <div class="carousel-viewport">
+              <div class="carousel-track">
+                <a class="carousel-slide" href="https://youtu.be/D66eHXt19dY?si=FC4S26JzhJXQAGKl" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/1400fef2-b4b1-422b-832a-1004bb94c49c.jpg" alt="Jazz on the clock"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">Jazz on the clock</div>
+                    <div class="slide-sub">Luxiem</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/JZIbfLeWiWY?si=17v1USqF8Q19LCVb" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/74f7e042-30fd-47ed-ab31-3e783f2853df.jpg" alt="病名は愛だった"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">病名は愛だった</div>
+                    <div class="slide-sub">Vezalius Bandage</div>
+                  </div>
+                </a>
+                <!-- 1. VOLTACTION - ELEVATE -->
+<a class="carousel-slide" href="https://youtu.be/AFaWBGveFOM?si=1fyCEs4KkFhxlL7B" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/AFaWBGveFOM/hqdefault.jpg" alt="ELEVATE"></div>
+  <div class="slide-info">
+    <div class="slide-title">ELEVATE</div>
+    <div class="slide-sub">VOLTACTION</div>
   </div>
 </a>
-            <a class="yt-card" href="https://youtu.be/2TqgQ2WzAwk?si=AHb4OLZTM19hMsGl" target="_blank">
-              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/2dcfe914-6494-43de-b150-8e9d8263a054.jpg" alt="Many Many More"></div>
-              <div class="yt-meta">
-                <div class="yt-name">Many Many More</div>
-                <div class="yt-sub">Cassian Floros</div>
+
+<!-- 2. VOLTACTION × 3SKM - Crashing Winners -->
+<a class="carousel-slide" href="https://youtu.be/Aj0qUkRK5Ec?si=TAgErmeKh5HEFm2R" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/Aj0qUkRK5Ec/hqdefault.jpg" alt="Crashing Winners"></div>
+  <div class="slide-info">
+    <div class="slide-title">Crashing Winners</div>
+    <div class="slide-sub">VOLTACTION × 3SKM</div>
+  </div>
+</a>
+
+<!-- 3. RhyZyGy - Like an Explosion -->
+<a class="carousel-slide" href="https://youtu.be/diUPLodlQAQ?si=0YHzD1cHdYJHkVXS" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/diUPLodlQAQ/hqdefault.jpg" alt="Like an Explosion"></div>
+  <div class="slide-info">
+    <div class="slide-title">Like an Explosion</div>
+    <div class="slide-sub">RhyZyGy</div>
+  </div>
+</a>
+
+<!-- 4. 유람 Yuram (PJX) - 브이믹스 무대 몰아보기 -->
+<a class="carousel-slide" href="https://youtu.be/M-oDKJrgBsg?si=TF3nvHKp6hdqUckQ" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/M-oDKJrgBsg/hqdefault.jpg" alt="브이믹스 무대 몰아보기"></div>
+  <div class="slide-info">
+    <div class="slide-title">브이믹스 무대 몰아보기</div>
+    <div class="slide-sub">유람 Yuram 【PJX】</div>
+  </div>
+</a>
+
+<!-- 5. SHUHYANG - Beggin' (Cover) -->
+<a class="carousel-slide" href="https://youtu.be/QDiAzonNW68?si=49EF9pxK0LnpojCN" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/QDiAzonNW68/hqdefault.jpg" alt="Beggin' (Cover)"></div>
+  <div class="slide-info">
+    <div class="slide-title">Beggin' (Cover)</div>
+    <div class="slide-sub">SHUHYANG (포더모어)</div>
+  </div>
+</a>
+
+<!-- 6. 포더모어 (For The More) - UNDEFEATED -->
+<a class="carousel-slide" href="https://youtu.be/kbI1PH8aMAE?si=K-u2unRb7PmkTtJV" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/kbI1PH8aMAE/hqdefault.jpg" alt="UNDEFEATED"></div>
+  <div class="slide-info">
+    <div class="slide-title">UNDEFEATED</div>
+    <div class="slide-sub">포더모어 (For The More)</div>
+  </div>
+</a>
+
+<!-- 7. IVNIT(이브닛) - Chrome -->
+<a class="carousel-slide" href="https://youtu.be/i3f9Jz6qNII?si=uDAdEB3QU-UVVjTU" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/i3f9Jz6qNII/hqdefault.jpg" alt="Chrome"></div>
+  <div class="slide-info">
+    <div class="slide-title">Chrome</div>
+    <div class="slide-sub">IVNIT (이브닛)</div>
+  </div>
+</a>
+
+<!-- 8. IRISÉ (KIIRI & TIZ) - Catch Me If You Can (Cover) -->
+<a class="carousel-slide" href="https://youtu.be/gJbIM-HygLI?si=j4QQ4nn1p8XO2vw9" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/gJbIM-HygLI/hqdefault.jpg" alt="Catch Me If You Can"></div>
+  <div class="slide-info">
+    <div class="slide-title">Catch Me If You Can (Cover)</div>
+    <div class="slide-sub">IRISÉ (KIIRI & TIZ)</div>
+  </div>
+</a>
+<!-- 1. Ren Zotto × Doppio Dropscythe - Play Back -->
+<a class="carousel-slide" href="https://youtu.be/psp_opqfX9c?si=VtlNBjchIfqjRSl4" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/psp_opqfX9c/hqdefault.jpg" alt="Play Back"></div>
+  <div class="slide-info">
+    <div class="slide-title">Play Back</div>
+    <div class="slide-sub">Ren Zotto × Doppio Dropscythe</div>
+  </div>
+</a>
+
+<!-- 2. Shu Yamino × Sonny Brisko - INFINITY -->
+<a class="carousel-slide" href="https://youtu.be/Dkl_qZnjC_E?si=BU2u_Z80up4bLCmj" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/Dkl_qZnjC_E/hqdefault.jpg" alt="INFINITY"></div>
+  <div class="slide-info">
+    <div class="slide-title">INFINITY</div>
+    <div class="slide-sub">Shu Yamino × Sonny Brisko</div>
+  </div>
+</a>
+
+<!-- 3. Zeal Ginjoka - Molotov Mocktail -->
+<a class="carousel-slide" href="https://youtu.be/rS3dQSF7ZMA?si=GiYGBYjhCDfiGcx6" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/rS3dQSF7ZMA/hqdefault.jpg" alt="Molotov Mocktail"></div>
+  <div class="slide-info">
+    <div class="slide-title">Molotov Mocktail</div>
+    <div class="slide-sub">Zeal Ginjoka</div>
+  </div>
+</a>
+
+<!-- 4. Lucien Lunaris × Kaelix Debonair - いらないもの (Chained) -->
+<a class="carousel-slide" href="https://youtu.be/bH4y-LzBmrE?si=nl1lKAT1JXrEuoTM" target="_blank">
+  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/bH4y-LzBmrE/hqdefault.jpg" alt="いらないもの (Chained)"></div>
+  <div class="slide-info">
+    <div class="slide-title">いらないもの (Chained) (Cover)</div>
+    <div class="slide-sub">Lucien Lunaris × Kaelix Debonair</div>
+  </div>
+</a>
+                <a class="carousel-slide" href="https://youtu.be/2TqgQ2WzAwk?si=AHb4OLZTM19hMsGl" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/2dcfe914-6494-43de-b150-8e9d8263a054.jpg" alt="Many Many More"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">Many Many More</div>
+                    <div class="slide-sub">Cassian Floros</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/qJlkfJj4pds?si=FfkV4_SsF-D7yl7Q" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/998e6e2d-26a3-4f8a-8dba-bc7af48e5c6c.jpg" alt="迷醉 Sangria"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">迷醉 Sangria</div>
+                    <div class="slide-sub">朔Sakuro</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/Vi6kykFZhnI" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/Vi6kykFZhnI/hqdefault.jpg" alt="降珞"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">降珞</div>
+                    <div class="slide-sub">Cetro賽特珞 x Sid東東</div>
+                  </div>
+                </a>
               </div>
-            </a>
+            </div>
+            <div class="carousel-controls">
+              <button class="carousel-btn prev-btn">‹ Prev</button>
+              <div class="carousel-dots"></div>
+              <button class="carousel-btn next-btn">Next ›</button>
+            </div>
           </div>
         </div>
       </div>
@@ -730,17 +1080,22 @@
       <div class="sec-grid">
         <div class="sec-left">
           <h2 class="section-title">💜 Jpop / 唱見篇</h2>
-          <p><b>✨ 團體：</b><br>
-            • <b>EL6</b>（春希💜、832💛）<br>
-            • <b>Paradox Live</b>（BAE）<br>
-            • <b>FouRTe Project</b>（ARTE ROBERTO）<br>
-            • <b>UniteUp!</b><br>
-            • <b>HoneyWorks</b><br>
-            • <b>Seven's Proud</b>🥹
-          </p>
-          <p style="margin-top: 18px;"><b>✨ 歌手：</b><br>
-            Hana、Ado、YOASOBI、96貓、天月、Yupsilon、nqrse、Natori、Centimillimental 溫詞
-          </p>
+
+          <div class="detail-card" onclick="openModal('jpop-groups')">
+            <div>
+              <div class="detail-card-title">✨團體名單</div>
+              <div class="detail-card-desc">EL6、Paradox Live、FouRTe Project、HoneyWorks...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('jpop-singers')">
+            <div>
+              <div class="detail-card-title">✨歌手名單</div>
+              <div class="detail-card-desc">Hana、Ado、YOASOBI、96貓、天月、Natori...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
         </div>
 
         <div class="sec-right">
@@ -763,43 +1118,53 @@
             </div>
           </div>
         
-          <div class="yt-box">
-            <div class="yt-box-title">🎵 推推</div>
-            <a class="yt-card" href="https://youtu.be/-2I7hb7DGk4?si=y59rP-BYtK7-fglh" target="_blank">
-              <div class="yt-thumb"><img src="https://img.youtube.com/vi/-2I7hb7DGk4/hqdefault.jpg" alt="Rap Guerrilla Reload"></div>
-              <div class="yt-meta">
-                <div class="yt-name">Rap Guerrilla Reload</div>
-                <div class="yt-sub">Paradox Live</div>
+          <!-- 滾動推薦歌曲 (Carousel) -->
+          <div class="carousel-wrapper" id="carousel-jpop">
+            <div class="carousel-header">🎵 推推歌曲</div>
+            <div class="carousel-viewport">
+              <div class="carousel-track">
+                <a class="carousel-slide" href="https://youtu.be/-2I7hb7DGk4?si=y59rP-BYtK7-fglh" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/-2I7hb7DGk4/hqdefault.jpg" alt="Rap Guerrilla Reload"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">Rap Guerrilla Reload</div>
+                    <div class="slide-sub">Paradox Live</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/p4vxaQ7n3nY?si=xiDYfBMx5iGttV90" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/p4vxaQ7n3nY/hqdefault.jpg" alt="TOKI"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">TOKI (LIVE映像)</div>
+                    <div class="slide-sub">Element Sicks【EL6】</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/GNV-FRcONeY?si=HCcrlA0xDUUZh_At" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/GNV-FRcONeY/hqdefault.jpg" alt="Addict."></div>
+                  <div class="slide-info">
+                    <div class="slide-title">Addict.</div>
+                    <div class="slide-sub">Element Sicks【EL6】</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/rGPd0FyjQ9w?si=XfyF_2GA28eCV_Va" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/rGPd0FyjQ9w/hqdefault.jpg" alt="ROSE"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">ROSE</div>
+                    <div class="slide-sub">HANA</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/J3IkxLOgolg?si=zzVr0EzZRfWfRvmA" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/J3IkxLOgolg/hqdefault.jpg" alt="キミがキミでキミだから"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">キミがキミでキミだから</div>
+                    <div class="slide-sub">FouRTe Project</div>
+                  </div>
+                </a>
               </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/p4vxaQ7n3nY?si=xiDYfBMx5iGttV90" target="_blank">
-              <div class="yt-thumb"><img src="https://img.youtube.com/vi/p4vxaQ7n3nY/hqdefault.jpg" alt="TOKI"></div>
-              <div class="yt-meta">
-                <div class="yt-name">TOKI (LIVE映像)</div>
-                <div class="yt-sub">Element Sicks【EL6】</div>
-              </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/GNV-FRcONeY?si=HCcrlA0xDUUZh_At" target="_blank">
-              <div class="yt-thumb"><img src="https://img.youtube.com/vi/GNV-FRcONeY/hqdefault.jpg" alt="Addict."></div>
-              <div class="yt-meta">
-                <div class="yt-name">Addict.</div>
-                <div class="yt-sub">Element Sicks【EL6】</div>
-              </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/rGPd0FyjQ9w?si=XfyF_2GA28eCV_Va" target="_blank">
-              <div class="yt-thumb"><img src="https://img.youtube.com/vi/rGPd0FyjQ9w/hqdefault.jpg" alt="ROSE"></div>
-              <div class="yt-meta">
-                <div class="yt-name">ROSE</div>
-                <div class="yt-sub">HANA</div>
-              </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/J3IkxLOgolg?si=zzVr0EzZRfWfRvmA" target="_blank">
-              <div class="yt-thumb"><img src="https://img.youtube.com/vi/J3IkxLOgolg/hqdefault.jpg" alt="キミがキミでキミだから"></div>
-              <div class="yt-meta">
-                <div class="yt-name">キミがキミでキミだから</div>
-                <div class="yt-sub">FouRTe Project</div>
-              </div>
-            </a>
+            </div>
+            <div class="carousel-controls">
+              <button class="carousel-btn prev-btn">‹ Prev</button>
+              <div class="carousel-dots"></div>
+              <button class="carousel-btn next-btn">Next ›</button>
+            </div>
           </div>
         </div>
       </div>
@@ -810,19 +1175,38 @@
       <div class="sec-grid">
         <div class="sec-left">
           <h2 class="section-title">💙 Anime</h2>
-          <p><b>🏐 運動：</b><br>
-          排球少年、藍色監獄、Free!!!男子游泳部、弦音風舞高中弓道部、後空翻少年、RE-MAIN、花漾滑冰</p>
-          <p><b>💥 戰鬥：</b><br>
-          WIND BREAKER—防風少年、咒術迴戰、鬼滅之刃、怪獸8號、文豪野犬、地獄樂、血界戰線、桃源暗鬼、夜櫻家大作戰、暗殺教室、我獨自升級、龍族、擅長逃跑的殿下、將國戡亂記</p>
-          <p><b>🌸 戀愛、BL與校園：</b><br>
-          Given被贈與的未來、魔道祖師、天官賜福、時光代理人、堀與宮村、指尖相觸戀戀不捨、式守同學不只可愛而已、去參加聯誼 卻發現完全沒有女生在場、現在是哪一個多聞、櫻蘭高校男公關、赤髮白雪姬、魔法水果籃、玩偶遊戲、愛麗絲學園、A3!、月歌</p>
-          <p><b>⚔️ 轉生或冒險：</b><br>
-          關於我轉生成史萊姆這檔事、無職轉生、在地下城尋求邂逅是否搞錯了什麼、遊戲人生、魔王學院的不適任者、肌肉魔法使、轉生貴族憑鑑定技能扭轉人生、治癒魔法的錯誤使用法、七魔劍支配天下、在異世界獲得超強能力的我在現實世界照樣無敵、秒殺外掛太強了異世界的傢伙們根本就不是對手、英雄王為了窮盡武道而轉生而後成為世界最強見習騎士、不相信人類的冒險者們好像要去拯救世界、聖者無雙上班族的異世界生存之道、仙王</p>
-          <p><b>🏰 惡役千金和女性向奇幻：</b><br>
-          輪迴七次的惡役千金在前敵國享受隨心所欲的新婚生活、轉生成女性向遊戲只有毀滅END的壞人大小姐、因為是反派大小姐所以養了魔王、成為悲劇元兇的最強異端最後頭目女王為了人民犧牲、轉生公主與天才千金的魔法革命、聖女魔力無所不能、銀砂糖師與黑妖精
-          </p>
-          <p><b>🌿 奇幻神怪與療癒日常：</b><br>
-          葬送的芙莉蓮、紫羅蘭永恆花園、藥師少女的獨語、憂國的莫里亞蒂、瓦尼塔斯的手札、約定的夢幻島、黑暗集會、物之古物奇譚（物物語）、綾島奇譚、未聞花名、擁有超常技能的異世界流浪美食家、異世界悠閒紀行~邊養娃邊當冒險者、異世界藥局、組長女兒與保母、學員奶爸、兩不疑</p>
+
+          <div class="detail-card" onclick="openModal('anime-sports')">
+            <div>
+              <div class="detail-card-title">運動&amp;戰鬥類</div>
+              <div class="detail-card-desc">排球少年、防風少年、咒術迴戰、怪獸8號...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('anime-love')">
+            <div>
+              <div class="detail-card-title">戀愛、BL與校園</div>
+              <div class="detail-card-desc">Given、魔道祖師、天官賜福、堀與宮村...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('anime-isekai')">
+            <div>
+              <div class="detail-card-title">轉生或冒險</div>
+              <div class="detail-card-desc">轉生史萊姆、無職轉生、地錯、轉生貴族...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('anime-fantasy')">
+            <div>
+              <div class="detail-card-title">惡役千金&amp;奇幻日常</div>
+              <div class="detail-card-desc">輪迴七次惡役千金、葬送的芙莉蓮、藥師少女的獨語...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
         </div>
 
         <div class="sec-right">
@@ -845,50 +1229,60 @@
             </div>
           </div>
 
-          <div class="yt-box">
-            <div class="yt-box-title">🎵 推推</div>
-            <a class="yt-card" href="https://youtu.be/VKviyEGvb94?si=i55nISWppPD6nqSm" target="_blank">
-              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/761c1bb2-d1ce-45fd-97c9-3e9558052718.jpg" alt="Fly high"></div>
-              <div class="yt-meta">
-                <div class="yt-name">Fly high</div>
-                <div class="yt-sub">排球少年</div>
+          <!-- 滾動推薦歌曲 (Carousel) -->
+          <div class="carousel-wrapper" id="carousel-anime">
+            <div class="carousel-header">🎵 推推歌曲</div>
+            <div class="carousel-viewport">
+              <div class="carousel-track">
+                <a class="carousel-slide" href="https://youtu.be/VKviyEGvb94?si=i55nISWppPD6nqSm" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/761c1bb2-d1ce-45fd-97c9-3e9558052718.jpg" alt="Fly high"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">Fly high</div>
+                    <div class="slide-sub">排球少年</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/LFoyXEFaz2Q?si=pemrHPsjE0hos5E7" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/0bfd57e4-133d-499e-a48e-18412d81ff20.jpg" alt="絕對零度"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">絕對零度</div>
+                    <div class="slide-sub">Natori</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/oe4XJ851oOk?si=N3d90tln4lAyIAiu" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/oe4XJ851oOk/hqdefault.jpg" alt="ReawakeR"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">ReawakeR</div>
+                    <div class="slide-sub">LiSA feat. Felix</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/qvk4Rl7r2GY?si=8fS86O0IDsSjmkhm" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/qvk4Rl7r2GY/hqdefault.jpg" alt="百花繚乱"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">百花繚乱</div>
+                    <div class="slide-sub">幾田りら</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/NLIGDjKBLY0?si=mny9obFwQ-_0QM8p" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/NLIGDjKBLY0/hqdefault.jpg" alt="革命道中 - On The Way"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">革命道中</div>
+                    <div class="slide-sub">アイナ・ジ・エンド</div>
+                  </div>
+                </a>
+                <a class="carousel-slide" href="https://youtu.be/dYzgZVhiqmU?si=6uHgXgNXjfuTFFal" target="_blank">
+                  <div class="slide-img-wrap"><img src="https://img.youtube.com/vi/dYzgZVhiqmU/hqdefault.jpg" alt="Ｗ●ＲＫ"></div>
+                  <div class="slide-info">
+                    <div class="slide-title">Ｗ●ＲＫ</div>
+                    <div class="slide-sub">MILLENNIUM PARADE × 椎名林檎</div>
+                  </div>
+                </a>
               </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/LFoyXEFaz2Q?si=pemrHPsjE0hos5E7" target="_blank">
-              <div class="yt-thumb"><img src="https://prd.resource-api.lit.link/images/creators/8d8a87d2-7cda-40ed-a6c4-52ac994d1036/0bfd57e4-133d-499e-a48e-18412d81ff20.jpg" alt="絕對零度"></div>
-              <div class="yt-meta">
-                <div class="yt-name">絕對零度</div>
-                <div class="yt-sub">Natori</div>
-              </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/oe4XJ851oOk?si=N3d90tln4lAyIAiu" target="_blank">
-              <div class="yt-thumb"><img src="https://img.youtube.com/vi/oe4XJ851oOk/hqdefault.jpg" alt="ReawakeR"></div>
-              <div class="yt-meta">
-                <div class="yt-name">ReawakeR</div>
-                <div class="yt-sub">LiSA feat. Felix</div>
-              </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/qvk4Rl7r2GY?si=8fS86O0IDsSjmkhm" target="_blank">
-              <div class="yt-thumb"><img src="https://img.youtube.com/vi/qvk4Rl7r2GY/hqdefault.jpg" alt="百花繚乱"></div>
-              <div class="yt-meta">
-                <div class="yt-name">百花繚乱</div>
-                <div class="yt-sub">幾田りら</div>
-              </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/NLIGDjKBLY0?si=mny9obFwQ-_0QM8p" target="_blank">
-              <div class="yt-thumb"><img src="https://img.youtube.com/vi/NLIGDjKBLY0/hqdefault.jpg" alt="革命道中 - On The Way"></div>
-              <div class="yt-meta">
-                <div class="yt-name">革命道中</div>
-                <div class="yt-sub">アイナ・ジ・エンド</div>
-              </div>
-            </a>
-            <a class="yt-card" href="https://youtu.be/dYzgZVhiqmU?si=6uHgXgNXjfuTFFal" target="_blank">
-              <div class="yt-thumb"><img src="https://img.youtube.com/vi/dYzgZVhiqmU/hqdefault.jpg" alt="Ｗ●ＲＫ"></div>
-              <div class="yt-meta">
-                <div class="yt-name">Ｗ●ＲＫ</div>
-                <div class="yt-sub">MILLENNIUM PARADE × 椎名林檎</div>
-              </div>
-            </a>
+            </div>
+            <div class="carousel-controls">
+              <button class="carousel-btn prev-btn">‹ Prev</button>
+              <div class="carousel-dots"></div>
+              <button class="carousel-btn next-btn">Next ›</button>
+            </div>
           </div>
         </div>
       </div>
@@ -897,14 +1291,101 @@
     <!-- Section 6: Comics -->
     <section id="s06">
       <div class="sec-grid">
-         <div class="sec-left">
+        <div class="sec-left">
           <h2 class="section-title">🤎 Comics (超愛)</h2>
-          <p><b>✨ 好看：</b><br>
-          某天成為公主、今生我來當家主、青梅竹馬情結、公會裡的偶像大大、先育兒再戀愛、誤打誤撞成為天才怪物演員、音樂天才：重生的樂章、穿越者的專屬特權、戀愛的季節、童畫之夢、各自倒數的那天、鳳凰涅槃</p>
-          <p><b>✨ 刺激：</b><br>
-          劍尊歸來、我培育的S級們、變成伯爵家的混混、史詩級領地設計師、末日前的退休計畫、全知讀者視角、被塔詛咒的獵人
-          <p style="margin-top: 14px;"><b>✨ BL ：</b><br>
-          水邊之夜、Given、落花池、定義關係、Sketch、16647、愛情往返、紅線挑戰、1995青春報告、梨花綻放的愛戀、Omega complex、卡麥納&amp;卡普里、自我中心的思考方式、我的室友帥哥學長、週五失戀聯盟</p>
+
+          <div class="detail-card" onclick="openModal('comic-fav')">
+            <div>
+              <div class="detail-card-title">好看推薦</div>
+              <div class="detail-card-desc">某天成為公主、今生我來當家主、先育兒再戀愛...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('comic-thrill')">
+            <div>
+              <div class="detail-card-title">刺激熱血</div>
+              <div class="detail-card-desc">劍尊歸來、我培育的S級們、史詩級領地設計師...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+
+          <div class="detail-card" onclick="openModal('comic-bl')">
+            <div>
+              <div class="detail-card-title">BL漫畫</div>
+              <div class="detail-card-desc">水邊之夜、Given、落花池、定義關係、Sketch...</div>
+            </div>
+            <span class="detail-card-arrow">查看 ➔</span>
+          </div>
+        </div>
+
+        <div class="sec-right">
+          <!-- 漫畫純文字滾動輪播 (Carousel，無圖片) -->
+          <div class="carousel-wrapper" id="carousel-comic">
+            <div class="carousel-header">📖推推漫畫作品</div>
+            <div class="carousel-viewport">
+              <div class="carousel-track">
+                <!-- 漫畫 1 -->
+                <a class="carousel-slide text-card-slide" href="https://share.google/LXnHl9ToLYoTBNaQd" target="_blank">
+                  <div class="slide-title">劍尊歸來</div>
+                  <div class="comic-action">武俠</div>
+                </a>
+
+                <!-- 漫畫 2 -->
+                <a class="carousel-slide text-card-slide" href="https://share.google/Jt7r1FatAYNSIFZH0" target="_blank">
+                  <div class="slide-title">某天成為公主</div>
+                  <div class="comic-action">歐式宮廷</div>
+                </a>
+
+                <!-- 漫畫 3 -->
+                <a class="carousel-slide text-card-slide" href="https://share.google/9cJmaNl0WGL0pp8pG" target="_blank">
+                  <div class="slide-title">公會裡的偶像大大</div>
+                  <div class="comic-action">愛情</div>
+                </a>
+
+                <!-- 漫畫 4 -->
+                <a class="carousel-slide text-card-slide" href="https://share.google/KXtCn7w99fhpExjDo" target="_blank">
+                  <div class="slide-title">我培育的S級們</div>
+                  <div class="comic-action">奇幻冒險</div>
+                </a>
+
+                <!-- 漫畫 5 -->
+                <a class="carousel-slide text-card-slide" href="https://share.google/9rkfiobXC7qBttKm9" target="_blank">
+                  <div class="slide-title">變成伯爵家的混混</div>
+                  <div class="comic-action">奇幻冒險</div>
+                </a>
+
+                <!-- 漫畫 6 -->
+                <a class="carousel-slide text-card-slide" href="https://share.google/QeEDTpzWaCuLUsuyG" target="_blank">
+                  <div class="slide-title">水邊之夜</div>
+                  <div class="comic-action">#ABO #後悔攻 #強攻強受</div>
+                </a>
+
+                <!-- 漫畫 7 -->
+                <a class="carousel-slide text-card-slide" href="https://share.google/aXStxauSf1lLqBfOn" target="_blank">
+                  <div class="slide-title">Kiss Me If You Can</div>
+                  <div class="comic-action">#ABO #演藝圈 #小說改編</div>
+                </a>
+
+                <!-- 漫畫 8 -->
+                <a class="carousel-slide text-card-slide" href="https://share.google/Nz8S2a6bdfUSuFckg" target="_blank">
+                  <div class="slide-title">Sketch</div>
+                  <div class="comic-action">#美人攻 #年下攻 #美人受</div>
+                </a>
+
+                <!-- 漫畫 9 -->
+                <a class="carousel-slide text-card-slide" href="https://share.google/Z3XpAYFqrynCL3VN2" target="_blank">
+                  <div class="slide-title">定義關係</div>
+                  <div class="comic-action">#ABO #美人攻 #小說改編</div>
+                </a>
+              </div>
+            </div>
+            <div class="carousel-controls">
+              <button class="carousel-btn prev-btn">‹ Prev</button>
+              <div class="carousel-dots"></div>
+              <button class="carousel-btn next-btn">Next ›</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -914,7 +1395,173 @@
     </footer>
   </main>
 
+  <!-- ---------- 詳細資料彈窗 (Modal Window) ---------- -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal-window">
+      <button class="modal-close" onclick="closeModalForce()">&times;</button>
+      <div class="modal-title" id="modalTitle">標題</div>
+      <div class="modal-body" id="modalBody">內容</div>
+    </div>
+  </div>
+
 <script>
+  // ---------- 詳細資料彈窗內容設定 ----------
+  const modalData = {
+    'kpop-ing': {
+      title: '💛 Kpop — Ing',
+      body: '• <b>BTS</b> 2016~ <br>• <b>Seventeen</b> 2017~ <br>• <b>PLAVE</b> 2023/3~ <br>• <b>WEGO-6</b> 2025/4~ <br>• <b>MiiWAN</b> 2026/5~'
+    },
+    'kpop-slow': {
+      title: '💛 Kpop — 緩追 / 追過一段時間',
+      body: '<b>✨目前緩追：</b><br>Super junior、I-DLE、Genblue 2023/6~、SKINZ 2025/4~<br><br><b>✨ 追一段時間：</b><br>BTOB、Apink、Mamamoo、GOT7、Shinhwa、Alien stage 2023/4'
+    },
+    'kpop-listener': {
+      title: '💛 Kpop — 小追不深（大多音飯）',
+      body: '<b>✨小追不深（大多音飯）：</b><br>NMIXX、MONSTA X、Kiss of life、Le sserafim、Kep1er、aespa、ITZY、TXT<br><br><b>✨ 純音飯：</b><br>IZ*ONE、AKMU'
+    },
+    'vt-global': {
+      title: '🧡 Vtuber — 各區名單',
+      body: '<b>EN：</b><br>• Nijisanji EN<br>• FSP EN<br>• Shoto<br><br><b>JP：</b><br>• Nijisanji JP<br>• Voltaction<br>• 3SKM<br>• By the beat<br><br><b>TW：</b><br>• 朔 (月蝕屋)<br>• 賽特珞 (Timaeus)<br>• 涅爾菲 (Alluria)<br>• 諾恪里 (CaKano)<br>• 阿萬<br><br><b>CN：</b><br>• Aza'
+    },
+    'vt-kr': {
+      title: '🧡 Vtuber — KR group (偏愛)',
+      body: '• <b>Psychord 싸이코드</b> (루이쨘、하루토)<br>• <b>For the more 포더모어</b> (별하、슈햑)<br>• <b>PJX 피제이엑스</b> (유럼)<br>• <b>SKOSHISM 스코시즘</b> (로보、오토、니노)<br>• <b>UNDAYS</b> (쿠로、세이)<br>• <b>IVNIT 이브닛</b> (한결、u32)<br>• <b>IRISÉ</b>'
+    },
+    'vt-singers': {
+      title: '🧡 Vtuber — 單聽歌 & Singers & Other',
+      body: '<b>單聽歌：</b><br>• Whale Taylor<br>• U-san<br>• AmaLee<br>• Dacapo<br>• Tomoya<br><br><b>Singers：</b><br>BL8M、AKUGETSU<br><br><b>Other：</b><br>Laser、Manta、델(frmt)🥹'
+    },
+    'jpop-groups': {
+      title: '💜 Jpop / 唱見 — 團體',
+      body: '• <b>EL6</b>（春希💜、832💛）<br>• <b>Paradox Live</b>（BAE）<br>• <b>FouRTe Project</b>（ARTE ROBERTO）<br>• <b>UniteUp!</b><br>• <b>HoneyWorks</b><br>• <b>Seven\'s Proud</b>🥹'
+    },
+    'jpop-singers': {
+      title: '💜 Jpop / 唱見 — 歌手',
+      body: 'Hana、Ado、YOASOBI、96貓、天月、Yupsilon、nqrse、Natori、Centimillimental 溫詞'
+    },
+    'anime-sports': {
+      title: '💙 Anime — 運動與戰鬥',
+      body: '<b>🏐運動：</b><br>排球少年、藍色監獄、Free!!!男子游泳部、弦音風舞高中弓道部、後空翻少年、RE-MAIN、花漾滑冰<br><br><b>💥戰鬥：</b><br>WIND BREAKER—防風少年、咒術迴戰、鬼滅之刃、怪獸8號、文豪野犬、地獄樂、血界戰線、桃源暗鬼、夜櫻家大作戰、暗殺教室、我獨自升級、龍族、擅長逃跑的殿下、將國戡亂記'
+    },
+    'anime-love': {
+      title: '💙 Anime — 戀愛、BL與校園',
+      body: 'Given被贈與的未來、魔道祖師、天官賜福、時光代理人、堀與宮村、指尖相觸戀戀不捨、式守同學不只可愛而已、去參加聯誼 卻發現完全沒有女生在場、現在是哪一個多聞、櫻蘭高校男公關、赤髮白雪姬、魔法水果籃、玩偶遊戲、愛麗絲學園、A3!、月歌'
+    },
+    'anime-isekai': {
+      title: '💙 Anime — 轉生或冒險',
+      body: '關於我轉生成史萊姆這檔事、無職轉生、在地下城尋求邂逅是否搞錯了什麼、遊戲人生、魔王學院的不適任者、肌肉魔法使、轉生貴族憑鑑定技能扭轉人生、治癒魔法的錯誤使用法、七魔劍支配天下、在異世界獲得超強能力的我在現實世界照樣無敵、秒殺外掛太強了異世界的傢伙們根本就不是對手、英雄王為了窮盡武道而轉生而後成為世界最強見習騎士、不相信人類的冒險者們好像要去拯救世界、聖者無雙上班族的異世界生存之道、仙王'
+    },
+    'anime-fantasy': {
+      title: '💙 Anime — 惡役千金與奇幻日常',
+      body: '<b>🏰惡役千金和女性向奇幻：</b><br>輪迴七次的惡役千金在前敵國享受隨心所欲的新婚生活、轉生成女性向遊戲只有毀滅END的壞人大小姐、因為是反派大小姐所以養了魔王、成為悲劇元兇的最強異端最後頭目女王為了人民犧牲、轉生公主與天才千金的魔法革命、聖女魔力無所不能、銀砂糖師與黑妖精<br><br><b>🌿奇幻神怪與療癒日常：</b><br>葬送的芙莉蓮、紫羅蘭永恆花園、藥師少女的獨語、憂國的莫里亞蒂、瓦尼塔斯的手札、約定的夢幻島、黑暗集會、物之古物奇譚（物物語）、綾島奇譚、未聞花名、擁有超常技能的異世界流浪美食家、異世界悠閒紀行~邊養娃邊當冒險者、異世界藥局、組長女兒與保母、學員奶爸、兩不疑'
+    },
+    'comic-fav': {
+      title: '🤎 Comics — 好看推薦',
+      body: '某天成為公主、今生我來當家主、青梅竹馬情結、公會裡的偶像大大、先育兒再戀愛、誤打誤撞成為天才怪物演員、音樂天才：重生的樂章、穿越者的專屬特權、戀愛的季節、童畫之夢、各自倒數的那天、鳳凰涅槃'
+    },
+    'comic-thrill': {
+      title: '🤎 Comics — 刺激熱血',
+      body: '劍尊歸來、我培育的S級們、變成伯爵家的混混、史詩級領地設計師、末日前的退休計畫、全知讀者視角、被塔詛咒的獵人'
+    },
+    'comic-bl': {
+      title: '🤎 Comics — BL 漫畫',
+      body: '水邊之夜、Given、落花池、定義關係、Sketch、16647、愛情往返、紅線挑戰、1995青春報告、梨花綻放的愛戀、Omega complex、卡麥納&amp;卡普里、自我中心的思考方式、我的室友帥哥學長、週五失戀聯盟'
+    }
+  };
+
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+
+  function openModal(key) {
+    if (modalData[key]) {
+      modalTitle.innerHTML = modalData[key].title;
+      modalBody.innerHTML = modalData[key].body;
+      modalOverlay.classList.add('active');
+    }
+  }
+
+  function closeModal(e) {
+    if (e.target === modalOverlay) {
+      modalOverlay.classList.remove('active');
+    }
+  }
+
+  function closeModalForce() {
+    modalOverlay.classList.remove('active');
+  }
+
+  // ---------- 輪播 Carousel 初始化 (含滑動手勢) ----------
+  function initCarousel(wrapperId) {
+    const wrapper = document.getElementById(wrapperId);
+    if (!wrapper) return;
+
+    const track = wrapper.querySelector('.carousel-track');
+    const slides = wrapper.querySelectorAll('.carousel-slide');
+    const prevBtn = wrapper.querySelector('.prev-btn');
+    const nextBtn = wrapper.querySelector('.next-btn');
+    const dotsContainer = wrapper.querySelector('.carousel-dots');
+
+    let current = 0;
+    const total = slides.length;
+
+    // 動態產生菱形點
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('div');
+      dot.classList.add('carousel-dot');
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    }
+    const dots = dotsContainer.querySelectorAll('.carousel-dot');
+
+    function update() {
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, idx) => d.classList.toggle('active', idx === current));
+    }
+
+    function goTo(idx) {
+      current = idx;
+      update();
+    }
+
+    prevBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      current = (current - 1 + total) % total;
+      update();
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      current = (current + 1) % total;
+      update();
+    });
+
+    // 手機觸控左右滑動支援
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    track.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 50) {
+        current = (current + 1) % total;
+        update();
+      } else if (touchEndX - touchStartX > 50) {
+        current = (current - 1 + total) % total;
+        update();
+      }
+    }, { passive: true });
+  }
+
+  // 初始化所有區塊輪播（含無圖片版漫畫輪播 carousel-comic）
+  ['carousel-kpop', 'carousel-vt', 'carousel-jpop', 'carousel-anime', 'carousel-comic'].forEach(initCarousel);
+
+  // ---------- 導航列高亮觀測 ----------
   const links = document.querySelectorAll('.chapters a');
   const sections = document.querySelectorAll('section');
   let ticking = false;
